@@ -1,0 +1,13 @@
+{
+  "name": "drew-bankston-wordpress",
+  "version": "1.0.0",
+  "description": "Drew Bankston Author Website - WordPress Theme & Plugin",
+  "scripts": {
+    "deploy:theme": "node scripts/deploy-theme.js",
+    "deploy:plugin": "node scripts/deploy-plugin.js",
+    "deploy:all": "npm run deploy:theme && npm run deploy:plugin"
+  },
+  "dependencies": {
+    "ssh2-sftp-client": "^9.1.0"
+  }
+}
