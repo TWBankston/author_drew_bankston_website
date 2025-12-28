@@ -179,10 +179,13 @@ foreach ( $cart as $item ) {
                                 <label for="account_password_confirm">Confirm Password *</label>
                                 <input type="password" id="account_password_confirm" name="account_password_confirm" minlength="8">
                             </div>
-                            <p class="form-help">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                                By creating an account, you'll be subscribed to our newsletter for updates on new releases and events. You can unsubscribe anytime.
-                            </p>
+                            <div class="form-group form-group--checkbox-inline">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="subscribe_newsletter" id="subscribe_newsletter" value="1" checked>
+                                    <span>Keep me updated on new releases, events, and exclusive content</span>
+                                </label>
+                                <p class="form-help form-help--subtle">You can unsubscribe anytime from your account settings.</p>
+                            </div>
                         </div>
                     </div>
                     <?php else : ?>
