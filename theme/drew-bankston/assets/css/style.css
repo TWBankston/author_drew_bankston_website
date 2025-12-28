@@ -722,6 +722,7 @@ p:last-child {
 
 /* Quill Container */
 .hero__quill-container {
+    display: none; /* Hidden on mobile (single column) */
     position: relative;
     width: 100%;
     height: 400px;
@@ -734,18 +735,12 @@ p:last-child {
     transition: opacity 0.8s ease-out;
 }
 
-@media (max-width: 1023px) {
+@media (min-width: 1024px) {
     .hero__quill-container {
-        height: 320px;
-        margin-top: var(--space-8);
+        display: block; /* Show on desktop (two column) */
     }
 }
 
-@media (max-width: 640px) {
-    .hero__quill-container {
-        height: 280px;
-    }
-}
 
 /* Nebula Glow */
 .hero__nebula-glow {
@@ -859,12 +854,6 @@ p:last-child {
     box-shadow: 0 0 15px #22d3ee, 0 0 30px #8b5cf6;
 }
 
-@media (max-width: 640px) {
-    .hero__quill {
-        width: 100px;
-        height: 135px;
-    }
-}
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
