@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.1.2' );
+define( 'DBT_VERSION', '3.1.3' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -272,10 +272,151 @@ function dbt_login_styles() {
             color: rgba(255, 255, 255, 0.6);
             font-size: 14px;
         }
+        
+        /* Divider */
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+        }
+        
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(199, 184, 255, 0.2);
+        }
+        
+        .login-divider::before {
+            margin-right: 16px;
+        }
+        
+        .login-divider::after {
+            margin-left: 16px;
+        }
+        
+        /* Secondary button (Create Account) */
+        .login-secondary-button {
+            display: block;
+            width: 100%;
+            background: transparent !important;
+            border: 2px solid rgba(199, 184, 255, 0.5) !important;
+            border-radius: 8px !important;
+            color: #c7b8ff !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            padding: 12px 24px !important;
+            text-align: center;
+            text-decoration: none !important;
+            transition: all 0.2s ease !important;
+            box-sizing: border-box;
+        }
+        
+        .login-secondary-button:hover,
+        .login-secondary-button:focus {
+            background: rgba(199, 184, 255, 0.1) !important;
+            border-color: #c7b8ff !important;
+            color: #fff !important;
+        }
+        
+        /* Additional action box */
+        .login-action-box {
+            background: rgba(26, 18, 48, 0.95);
+            border: 1px solid rgba(199, 184, 255, 0.15);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .login-action-box p {
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0 0 16px;
+            font-size: 14px;
+        }
+        
+        /* Registration form specific styles */
+        .login.action-register #registerform {
+            background: rgba(26, 18, 48, 0.95) !important;
+        }
+        
+        .login #registerform .button-primary {
+            background: linear-gradient(135deg, #c7b8ff 0%, #a890ff 100%) !important;
+            border: none !important;
+            border-radius: 8px !important;
+            color: #0f0a1e !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            padding: 12px 24px !important;
+            width: 100% !important;
+        }
+        
+        /* Lost password form specific */
+        .login.action-lostpassword #lostpasswordform {
+            background: rgba(26, 18, 48, 0.95) !important;
+        }
+        
+        /* Indicator text on registration */
+        .login #reg_passmail {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            margin-top: 16px;
+        }
     </style>
     <?php
 }
 add_action( 'login_enqueue_scripts', 'dbt_login_styles' );
+
+/**
+ * Add custom content after login form (Create Account button)
+ */
+function dbt_login_footer_content() {
+    // Get current action
+    $action = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : 'login';
+    
+    // Only show on login page, not on register or lostpassword
+    if ( $action === 'login' || empty( $action ) ) {
+        // Check if registration is enabled
+        if ( get_option( 'users_can_register' ) ) {
+            ?>
+            <div class="login-action-box">
+                <p>Don't have an account?</p>
+                <a href="<?php echo esc_url( wp_registration_url() ); ?>" class="login-secondary-button">
+                    Create an Account
+                </a>
+            </div>
+            <?php
+        }
+    }
+    
+    // Show login button on registration page
+    if ( $action === 'register' ) {
+        ?>
+        <div class="login-action-box">
+            <p>Already have an account?</p>
+            <a href="<?php echo esc_url( wp_login_url() ); ?>" class="login-secondary-button">
+                Sign In
+            </a>
+        </div>
+        <?php
+    }
+    
+    // Show login button on lost password page
+    if ( $action === 'lostpassword' ) {
+        ?>
+        <div class="login-action-box">
+            <p>Remember your password?</p>
+            <a href="<?php echo esc_url( wp_login_url() ); ?>" class="login-secondary-button">
+                Back to Sign In
+            </a>
+        </div>
+        <?php
+    }
+}
+add_action( 'login_footer', 'dbt_login_footer_content' );
 
 /**
  * Custom login logo URL
