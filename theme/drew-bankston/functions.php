@@ -185,19 +185,18 @@ function dbt_login_styles() {
         /* Links - consistent with main site link styling */
         .login #nav a,
         .login #backtoblog a {
-            color: #c7b8ff;
-            font-size: 13px;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            position: relative;
+            color: #c7b8ff !important;
+            font-size: 13px !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease !important;
         }
         
         .login #nav a:hover,
         .login #backtoblog a:hover {
-            color: #c7b8ff;
-            text-decoration: underline;
-            text-decoration-color: #c7b8ff;
-            text-underline-offset: 3px;
+            color: #fff !important;
+            text-decoration: underline !important;
+            text-decoration-color: #c7b8ff !important;
+            text-underline-offset: 3px !important;
         }
         
         .login #nav,
