@@ -729,6 +729,9 @@ p:last-child {
     align-items: center;
     justify-content: center;
     perspective: 1000px;
+    /* Start hidden - JavaScript fades in after title types */
+    opacity: 0;
+    transition: opacity 0.8s ease-out;
 }
 
 @media (max-width: 1023px) {
