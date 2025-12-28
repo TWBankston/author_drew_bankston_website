@@ -2915,14 +2915,27 @@ lottie-player {
 @media (max-width: 768px) {
     .cart-item {
         position: relative;
-        grid-template-columns: 60px 1fr;
+        grid-template-columns: 60px 1fr 1fr;
         gap: var(--space-3);
         padding-right: var(--space-10); /* Make room for remove button */
     }
     
-    .cart-item__quantity,
-    .cart-item__subtotal {
+    .cart-item__details {
+        grid-column: 2 / -1; /* Span from column 2 to the end */
+    }
+    
+    .cart-item__quantity {
         grid-column: 2;
+        display: flex;
+        align-items: center;
+    }
+    
+    .cart-item__subtotal {
+        grid-column: 3;
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     
     .cart-item__remove {
