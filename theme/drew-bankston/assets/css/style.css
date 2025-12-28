@@ -2934,8 +2934,9 @@ lottie-player {
 
 .cart-item__image img {
     width: 80px;
-    height: 120px;
-    object-fit: cover;
+    height: auto;
+    max-height: 120px;
+    object-fit: contain;
     border-radius: var(--radius-md);
 }
 
@@ -2969,7 +2970,9 @@ lottie-player {
 
 .quantity-control__btn {
     width: 36px;
+    min-width: 36px;
     height: 36px;
+    flex-shrink: 0;
     background: transparent;
     border: none;
     color: var(--color-text-primary);
