@@ -726,7 +726,6 @@ p:last-child {
     position: relative;
     width: 100%;
     height: 400px;
-    display: flex;
     align-items: center;
     justify-content: center;
     perspective: 1000px;
@@ -737,7 +736,7 @@ p:last-child {
 
 @media (min-width: 1024px) {
     .hero__quill-container {
-        display: block; /* Show on desktop (two column) */
+        display: flex; /* Show on desktop (two column) */
     }
 }
 
