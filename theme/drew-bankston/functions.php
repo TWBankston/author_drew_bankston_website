@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.1.6' );
+define( 'DBT_VERSION', '3.1.7' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -322,7 +322,19 @@ function dbt_login_styles() {
             color: #fff !important;
         }
         
-        /* Additional action box */
+        /* Inline action section (inside form) */
+        .login-inline-action {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .login-inline-action p {
+            color: rgba(255, 255, 255, 0.5);
+            margin: 0 0 12px;
+            font-size: 13px;
+        }
+        
+        /* Additional action box (outside form - for register/lostpassword pages) */
         .login-action-box {
             background: rgba(26, 18, 48, 0.95);
             border: 1px solid rgba(199, 184, 255, 0.15);
@@ -333,7 +345,6 @@ function dbt_login_styles() {
             width: 320px;
             max-width: calc(100% - 40px);
             box-sizing: border-box;
-            /* Center on page - login_footer outputs outside #login wrapper */
             position: relative;
             left: 50%;
             transform: translateX(-50%);
@@ -367,10 +378,32 @@ function dbt_login_styles() {
         }
         
         /* Indicator text on registration */
-        .login #reg_passmail {
+        .login #reg_passmail,
+        .login p.indicator-hint {
             color: rgba(255, 255, 255, 0.6);
             font-size: 13px;
             margin-top: 16px;
+            background: rgba(26, 18, 48, 0.8);
+            border: 1px solid rgba(199, 184, 255, 0.15);
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+        
+        /* Registration confirmation message */
+        .login .message.register {
+            background: rgba(26, 18, 48, 0.9);
+            border-left: 4px solid #c7b8ff;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 12px 16px;
+        }
+        
+        /* Description text under inputs on registration */
+        .login #registerform p.description,
+        .login #registerform .description {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            margin-top: 8px;
         }
     </style>
     <?php
@@ -378,37 +411,42 @@ function dbt_login_styles() {
 add_action( 'login_enqueue_scripts', 'dbt_login_styles' );
 
 /**
- * Add custom content after login form (Create Account button)
+ * Add Create Account button inside login form
+ */
+function dbt_login_form_create_account() {
+    ?>
+    <div class="login-inline-action">
+        <div class="login-divider">or</div>
+        <a href="<?php echo esc_url( wp_registration_url() ); ?>" class="login-secondary-button">
+            Create an Account
+        </a>
+    </div>
+    <?php
+}
+add_action( 'login_form', 'dbt_login_form_create_account' );
+
+/**
+ * Add Sign In button inside registration form
+ */
+function dbt_register_form_signin() {
+    ?>
+    <div class="login-inline-action">
+        <div class="login-divider">or</div>
+        <a href="<?php echo esc_url( wp_login_url() ); ?>" class="login-secondary-button">
+            Sign In
+        </a>
+    </div>
+    <?php
+}
+add_action( 'register_form', 'dbt_register_form_signin' );
+
+/**
+ * Add Back to Sign In button on lost password page (via footer since no hook inside form)
  */
 function dbt_login_footer_content() {
-    // Get current action
     $action = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : 'login';
     
-    // Only show on login page, not on register or lostpassword
-    if ( $action === 'login' || empty( $action ) ) {
-        ?>
-        <div class="login-action-box">
-            <p>Don't have an account?</p>
-            <a href="<?php echo esc_url( wp_registration_url() ); ?>" class="login-secondary-button">
-                Create an Account
-            </a>
-        </div>
-        <?php
-    }
-    
-    // Show login button on registration page
-    if ( $action === 'register' ) {
-        ?>
-        <div class="login-action-box">
-            <p>Already have an account?</p>
-            <a href="<?php echo esc_url( wp_login_url() ); ?>" class="login-secondary-button">
-                Sign In
-            </a>
-        </div>
-        <?php
-    }
-    
-    // Show login button on lost password page
+    // Only show on lost password page
     if ( $action === 'lostpassword' ) {
         ?>
         <div class="login-action-box">
