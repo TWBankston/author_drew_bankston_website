@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.2.5' );
+define( 'DBT_VERSION', '3.2.8' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -267,6 +267,9 @@ function dbt_login_styles() {
             height: 20px;
             font-size: 20px;
             line-height: 1;
+            vertical-align: middle !important;
+            position: relative;
+            top: -0.5px;
         }
         
         /* Privacy policy link */
