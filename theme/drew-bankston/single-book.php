@@ -34,9 +34,10 @@ while ( have_posts() ) : the_post();
         if ( $series->slug === 'standalones' ) {
             $series_label = dbt_get_standalone_label( get_the_ID() );
         } else {
-            $series_label = $series->name;
             if ( $series_order ) {
-                $series_label .= ' - Book ' . $series_order;
+                $series_label = 'Book ' . $series_order . ' in the ' . $series->name . ' Series';
+            } else {
+                $series_label = $series->name . ' Series';
             }
         }
     }
