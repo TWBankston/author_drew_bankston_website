@@ -78,8 +78,8 @@ if ( isset( $_POST['dbc_change_password'] ) && wp_verify_nonce( $_POST['dbc_pass
 ?>
 
 <main id="primary" class="site-main">
-    <!-- Hero Section - Compact for account page -->
-    <section class="hero hero--compact">
+    <!-- Hero Section -->
+    <section class="hero" style="min-height: 50vh;">
         <div class="hero__bg"></div>
         <div class="container">
             <div class="hero__content gsap-reveal" style="text-align: center; max-width: 100%;">
