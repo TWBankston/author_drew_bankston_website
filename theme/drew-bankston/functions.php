@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.1.4' );
+define( 'DBT_VERSION', '3.1.5' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -328,8 +328,11 @@ function dbt_login_styles() {
             border: 1px solid rgba(199, 184, 255, 0.15);
             border-radius: 16px;
             padding: 24px;
-            margin-top: 20px;
+            margin: 20px auto 0;
             text-align: center;
+            width: 320px;
+            max-width: calc(100% - 40px);
+            box-sizing: border-box;
         }
         
         .login-action-box p {
