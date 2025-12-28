@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.2.0' );
+define( 'DBT_VERSION', '3.2.2' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -354,20 +354,21 @@ function dbt_login_styles() {
         
         /* Inline action section (inside form) */
         .login-inline-action {
-            margin-top: 16px;
+            margin-top: 32px !important;
+            padding-top: 8px;
             text-align: center;
             width: 100%;
         }
         
         /* Divider inside inline action */
         .login-inline-action .login-divider {
-            margin: 0 0 16px 0;
+            margin: 0 0 20px 0;
         }
         
         .login-inline-action p,
         .login-inline-hint {
             color: rgba(255, 255, 255, 0.6) !important;
-            margin: 0 0 16px 0 !important;
+            margin: 0 0 12px 0 !important;
             font-size: 13px !important;
             background: none !important;
             border: none !important;
@@ -376,6 +377,12 @@ function dbt_login_styles() {
         
         .login-inline-action .login-secondary-button {
             margin-top: 0;
+        }
+        
+        /* Space between submit and inline action section */
+        #loginform .submit,
+        #registerform .submit {
+            margin-bottom: 0 !important;
         }
         
         /* Additional action box (outside form - for register/lostpassword pages) */
