@@ -133,6 +133,43 @@ function dbc_populate_purchase_data() {
 add_action( 'admin_init', 'dbc_populate_purchase_data' );
 
 /**
+ * Admin action to fix free chapter filenames
+ * Trigger via: /wp-admin/?dbc_fix_free_chapters=1
+ */
+function dbc_fix_free_chapter_filenames() {
+    if ( ! isset( $_GET['dbc_fix_free_chapters'] ) || ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+    
+    // Map of book slugs to correct filenames (with spaces preserved)
+    $chapter_files = array(
+        'khizara'               => 'Free Chapter - Khizara.pdf',
+        'tokorel-book-2'        => 'Free Chapter Tokorel Book 2.pdf',
+        'the-imagination-stone' => 'Free Chapter - Imagination Stone.pdf',
+        'lines-of-force'        => 'Free Chapter - Lines of Force.pdf',
+        'sounds-of-tomorrow'    => 'Free Chapter - Sounds of Tomorrow.pdf',
+    );
+    
+    $output = '<h2>Fixing Free Chapter Filenames</h2><ul>';
+    
+    foreach ( $chapter_files as $slug => $filename ) {
+        $book = get_page_by_path( $slug, OBJECT, 'book' );
+        
+        if ( $book ) {
+            update_post_meta( $book->ID, '_dbc_book_free_chapter', $filename );
+            $output .= '<li>✅ Updated <strong>' . esc_html( $book->post_title ) . '</strong>: ' . esc_html( $filename ) . '</li>';
+        } else {
+            $output .= '<li>⚠️ Book not found: ' . esc_html( $slug ) . '</li>';
+        }
+    }
+    
+    $output .= '</ul><p><a href="' . home_url( '/account/' ) . '">Test Downloads →</a></p>';
+    
+    wp_die( $output, 'Free Chapter Filenames Fixed', array( 'response' => 200 ) );
+}
+add_action( 'admin_init', 'dbc_fix_free_chapter_filenames' );
+
+/**
  * Admin action to create cart/checkout pages
  * Trigger via: /wp-admin/?dbc_create_shop_pages=1
  */

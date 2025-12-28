@@ -385,9 +385,9 @@ class DBC_Meta_Boxes {
         $featured = isset( $_POST['dbc_book_featured'] ) ? '1' : '';
         update_post_meta( $post_id, '_dbc_book_featured', $featured );
         
-        // Free chapter filename
+        // Free chapter filename (use sanitize_text_field to preserve spaces in filename)
         if ( isset( $_POST['dbc_book_free_chapter'] ) ) {
-            update_post_meta( $post_id, '_dbc_book_free_chapter', sanitize_file_name( $_POST['dbc_book_free_chapter'] ) );
+            update_post_meta( $post_id, '_dbc_book_free_chapter', sanitize_text_field( $_POST['dbc_book_free_chapter'] ) );
         }
         
         // Retailer URLs
