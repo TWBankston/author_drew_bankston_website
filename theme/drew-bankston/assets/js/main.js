@@ -271,8 +271,10 @@
         // Track if divider animation has been triggered
         let dividerAnimationTriggered = false;
         
-        // Get the actual page title from the element
-        const pageTitle = heroTitle.textContent.trim() || 'Drew Bankston';
+        // Get the page title - prefer data attribute, then text content
+        const dataText = heroTitle.getAttribute('data-typewriter-text');
+        const textSpanContent = heroTitle.querySelector('.typewriter-text')?.textContent.trim();
+        const pageTitle = dataText || textSpanContent || 'Drew Bankston';
         
         // Initially hide quill on homepage
         if (isHomepage && quillContainer) {
@@ -374,10 +376,10 @@
         let textSpan = element.querySelector('.typewriter-text');
         let cursor = element.querySelector('.typewriter-cursor');
         
-        // Get the text to type - either from option, existing text span, or element content
+        // Get the text to type - priority: option > data attribute > existing text span > fallback
         let originalText = settings.text || 
+                          element.getAttribute('data-typewriter-text') ||
                           (textSpan && textSpan.textContent.trim()) || 
-                          element.textContent.trim() || 
                           'Drew Bankston';
         
         // Set up the element structure if not already present

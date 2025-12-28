@@ -32,7 +32,7 @@ get_header();
             <!-- Left Content -->
             <div class="hero__content">
                 <p class="hero__eyebrow">Colorado Author</p>
-                <h1 class="hero__title hero__title--typewriter">
+                <h1 class="hero__title hero__title--typewriter" data-typewriter-text="Drew Bankston">
                     <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
                 </h1>
                 <p class="hero__subtitle">Award-winning author crafting immersive worlds where science fiction meets human emotion, and fantasy ignites the imagination.</p>
