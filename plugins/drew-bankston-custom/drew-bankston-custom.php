@@ -170,6 +170,45 @@ function dbc_fix_free_chapter_filenames() {
 add_action( 'admin_init', 'dbc_fix_free_chapter_filenames' );
 
 /**
+ * Admin action to fix book formats stored as arrays
+ * Trigger via: /wp-admin/?dbc_fix_formats=1
+ */
+function dbc_fix_book_formats() {
+    if ( ! isset( $_GET['dbc_fix_formats'] ) || ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+    
+    $books = get_posts( array(
+        'post_type'      => 'book',
+        'posts_per_page' => -1,
+        'post_status'    => 'any',
+    ) );
+    
+    $output = '<h2>Fixing Book Formats</h2><ul>';
+    
+    foreach ( $books as $book ) {
+        $formats = get_post_meta( $book->ID, '_dbc_book_formats', true );
+        
+        if ( is_array( $formats ) ) {
+            // Convert array to comma-separated string
+            $formats_string = implode( ', ', array_filter( array_map( function( $f ) {
+                return is_array( $f ) ? implode( ', ', $f ) : $f;
+            }, $formats ) ) );
+            
+            update_post_meta( $book->ID, '_dbc_book_formats', $formats_string );
+            $output .= '<li>✅ Fixed <strong>' . esc_html( $book->post_title ) . '</strong>: ' . esc_html( $formats_string ) . '</li>';
+        } else {
+            $output .= '<li>✓ <strong>' . esc_html( $book->post_title ) . '</strong>: Already a string - ' . esc_html( $formats ?: '(empty)' ) . '</li>';
+        }
+    }
+    
+    $output .= '</ul><p><a href="' . home_url( '/books/khizara/' ) . '">Test Khizara Page →</a></p>';
+    
+    wp_die( $output, 'Book Formats Fixed', array( 'response' => 200 ) );
+}
+add_action( 'admin_init', 'dbc_fix_book_formats' );
+
+/**
  * Admin action to create cart/checkout pages
  * Trigger via: /wp-admin/?dbc_create_shop_pages=1
  */
