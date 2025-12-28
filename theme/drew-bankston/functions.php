@@ -70,9 +70,9 @@ function dbt_login_styles() {
     $bg_url = DBT_URL . '/assets/images/login-bg.jpg'; // Optional background
     ?>
     <style type="text/css">
-        /* Login page background */
+        /* Login page background - matches main site colors */
         body.login {
-            background: linear-gradient(135deg, #0f0a1e 0%, #1a1230 50%, #0f0a1e 100%);
+            background: linear-gradient(135deg, #0d0f12 0%, #111522 50%, #171c2a 100%);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
@@ -87,11 +87,11 @@ function dbt_login_styles() {
             margin-bottom: 30px;
         }
         
-        /* Login form container */
+        /* Login form container - matches main site card style */
         .login form,
         #loginform {
-            background: rgba(26, 18, 48, 0.95) !important;
-            border: 1px solid rgba(199, 184, 255, 0.15) !important;
+            background: rgba(23, 28, 42, 0.95) !important;
+            border: 1px solid rgba(199, 184, 255, 0.12) !important;
             border-radius: 16px !important;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
             padding: 30px 24px !important;
@@ -104,14 +104,14 @@ function dbt_login_styles() {
             font-weight: 500;
         }
         
-        /* Input fields */
+        /* Input fields - matches main site form style */
         .login input[type="text"],
         .login input[type="password"],
         .login input[type="email"],
         #user_login,
         #user_pass {
-            background: rgba(15, 10, 30, 0.9) !important;
-            border: 1px solid rgba(199, 184, 255, 0.25) !important;
+            background: rgba(13, 15, 18, 0.9) !important;
+            border: 1px solid rgba(199, 184, 255, 0.2) !important;
             border-radius: 8px !important;
             color: #fff !important;
             padding: 12px 16px !important;
@@ -126,9 +126,9 @@ function dbt_login_styles() {
         .login input[type="email"]:focus,
         #user_login:focus,
         #user_pass:focus {
-            background: rgba(15, 10, 30, 1) !important;
+            background: rgba(13, 15, 18, 1) !important;
             border-color: #c7b8ff !important;
-            box-shadow: 0 0 0 3px rgba(199, 184, 255, 0.2) !important;
+            box-shadow: 0 0 0 3px rgba(199, 184, 255, 0.15) !important;
             outline: none !important;
         }
         
@@ -144,8 +144,8 @@ function dbt_login_styles() {
         }
         
         .login input[type="checkbox"] {
-            background: rgba(15, 10, 30, 0.8);
-            border: 1px solid rgba(199, 184, 255, 0.3);
+            background: rgba(13, 15, 18, 0.8);
+            border: 1px solid rgba(199, 184, 255, 0.25);
             border-radius: 4px;
         }
         
@@ -182,28 +182,37 @@ function dbt_login_styles() {
             color: #0f0a1e !important;
         }
         
-        /* Links */
+        /* Links - consistent with main site link styling */
         .login #nav a,
         .login #backtoblog a {
-            color: rgba(199, 184, 255, 0.7);
+            color: #c7b8ff;
             font-size: 13px;
-            transition: color 0.2s ease;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            position: relative;
         }
         
         .login #nav a:hover,
         .login #backtoblog a:hover {
-            color: #c7b8ff;
+            color: #d4c7ff;
+            text-decoration: underline;
+            text-underline-offset: 3px;
         }
         
         .login #nav,
         .login #backtoblog {
             text-align: center;
+            margin-top: 16px;
+        }
+        
+        .login #nav {
+            margin-bottom: 8px;
         }
         
         /* Error/Info messages */
         .login .message,
         .login .success {
-            background: rgba(26, 18, 48, 0.9);
+            background: rgba(23, 28, 42, 0.9);
             border-left: 4px solid #c7b8ff;
             border-radius: 8px;
             color: rgba(255, 255, 255, 0.9);
