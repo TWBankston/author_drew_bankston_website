@@ -261,17 +261,19 @@
      * For interior pages: Just title typewriter with page title
      */
     function initHeroAnimationSequence() {
-        const heroTitle = document.querySelector('.hero__title');
+        // Only apply typewriter to elements with the specific typewriter class
+        const heroTitle = document.querySelector('.hero__title--typewriter');
         const quillContainer = document.querySelector('.hero__quill-container');
         const dividerPlayer = document.getElementById('magic-divider');
         const isHomepage = !!quillContainer; // Homepage has the quill container
         
+        // If no typewriter title found, don't do anything
         if (!heroTitle) return;
         
         // Track if divider animation has been triggered
         let dividerAnimationTriggered = false;
         
-        // Get the page title - prefer data attribute, then text content
+        // Get the page title - prefer data attribute, then text span content
         const dataText = heroTitle.getAttribute('data-typewriter-text');
         const textSpanContent = heroTitle.querySelector('.typewriter-text')?.textContent.trim();
         const pageTitle = dataText || textSpanContent || 'Drew Bankston';
