@@ -70,3 +70,4 @@ $term = get_queried_object();
 <?php
 get_footer();
 
+

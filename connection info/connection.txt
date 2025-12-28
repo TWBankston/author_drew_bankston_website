@@ -1,0 +1,24 @@
+Site:
+dbankston.wordkeeper.net
+Host:
+172.233.152.148
+Protocol:
+SFTP Only
+Port:
+2222
+SFTP Username:
+staging_dbankston
+SFTP Password:
+1l28K2HWxRjsfjR7
+DB URL:
+https://db-jacobtyler2.wordkeeper.net/
+DB Username:
+staging_dbankston
+DB Password:
+0f6A7M60jyMFP1XE
+WordPress Username:
+dbankston
+WordPress Password:
+tmdcAotmzwGFzKc1
+DNS Record (CNAME):
+jacobtyler2.wordkeeper.net

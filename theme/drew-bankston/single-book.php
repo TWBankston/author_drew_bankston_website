@@ -17,6 +17,13 @@ while ( have_posts() ) : the_post();
     $amazon_url   = get_post_meta( get_the_ID(), '_dbc_book_amazon_url', true );
     $reviews      = get_post_meta( get_the_ID(), '_dbc_book_reviews', true );
     $awards       = get_post_meta( get_the_ID(), '_dbc_book_awards', true );
+    $free_chapter = get_post_meta( get_the_ID(), '_dbc_book_free_chapter', true );
+    
+    // Purchase options
+    $signed_enabled  = get_post_meta( get_the_ID(), '_dbc_book_signed_enabled', true );
+    $signed_price    = get_post_meta( get_the_ID(), '_dbc_book_signed_price', true );
+    $digital_enabled = get_post_meta( get_the_ID(), '_dbc_book_digital_enabled', true );
+    $digital_price   = get_post_meta( get_the_ID(), '_dbc_book_digital_price', true );
     
     $series = dbt_get_book_series( get_the_ID() );
     $genre_display = dbt_get_book_genre( get_the_ID() );
@@ -64,11 +71,67 @@ while ( have_posts() ) : the_post();
                 </div>
                 <?php endif; ?>
                 
-                <div class="book-hero__cta">
-                    <?php if ( $amazon_url ) : ?>
-                        <a href="<?php echo esc_url( $amazon_url ); ?>" target="_blank" rel="noopener" class="btn btn--primary btn--lg">Buy on Amazon</a>
+                <!-- Purchase Options -->
+                <div class="book-hero__purchase">
+                    <h3 class="book-hero__purchase-title">Get Your Copy</h3>
+                    
+                    <div class="book-hero__purchase-options">
+                        <?php if ( $amazon_url ) : ?>
+                        <a href="<?php echo esc_url( $amazon_url ); ?>" target="_blank" rel="noopener" class="purchase-option purchase-option--amazon">
+                            <span class="purchase-option__icon">
+                                <svg viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M257.2 162.7c-48.7 1.8-169.5 15.5-169.5 117.5 0 109.5 138.3 114 183.5 43.2 6.5 10.2 35.4 37.5 45.3 46.8l56.8-56S341 288.9 341 261.4V114.3C341 89 316.5 32 228.7 32 140.7 32 94 87 94 136.3l73.5 6.8c16.3-49.5 54.2-49.5 54.2-49.5 40.7-.1 35.5 29.8 35.5 69.1zm0 86.8c0 80-84.2 68-84.2 17.2 0-47.2 50.5-56.7 84.2-57.8v40.6zm136 163.5c-7.7 10-70 67-174.5 67S34.2 408.5 9.7 379c-6.8-7.7 1-11.3 5.5-8.3C88.5 415.2 203 488.5 387.7 401c7.5-3.7 13.3 2 5.5 12zm39.8 2.2c-6.5 15.8-16 26.8-21.2 31-5.5 4.5-9.5 2.7-6.5-3.8s19.3-46.5 12.7-55c-6.5-8.3-37-4.3-48-3.2-10.8 1-13 2-14-.3-2.3-5.7 21.7-15.5 37.5-17.5 15.7-1.8 41-.8 46 5.7 3.7 5.1 0 27.1-6.5 43.1z"/></svg>
+                            </span>
+                            <span class="purchase-option__text">
+                                <span class="purchase-option__label">Buy on Amazon</span>
+                                <span class="purchase-option__sublabel">Kindle & Paperback</span>
+                            </span>
+                            <span class="purchase-option__arrow">→</span>
+                        </a>
+                        <?php endif; ?>
+                        
+                        <?php if ( $signed_enabled && $signed_price ) : ?>
+                        <button type="button" class="purchase-option purchase-option--signed" data-purchase="signed" data-book-id="<?php echo esc_attr( get_the_ID() ); ?>" data-book-title="<?php echo esc_attr( get_the_title() ); ?>" data-price="<?php echo esc_attr( $signed_price ); ?>">
+                            <span class="purchase-option__icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z"/></svg>
+                            </span>
+                            <span class="purchase-option__text">
+                                <span class="purchase-option__label">Signed Paperback</span>
+                                <span class="purchase-option__sublabel">$<?php echo esc_html( number_format( (float) $signed_price, 2 ) ); ?> + S&H</span>
+                            </span>
+                            <span class="purchase-option__arrow">→</span>
+                        </button>
+                        <?php endif; ?>
+                        
+                        <?php if ( $digital_enabled && $digital_price ) : ?>
+                        <button type="button" class="purchase-option purchase-option--digital" data-purchase="digital" data-book-id="<?php echo esc_attr( get_the_ID() ); ?>" data-book-title="<?php echo esc_attr( get_the_title() ); ?>" data-price="<?php echo esc_attr( $digital_price ); ?>">
+                            <span class="purchase-option__icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            </span>
+                            <span class="purchase-option__text">
+                                <span class="purchase-option__label">Digital Copy</span>
+                                <span class="purchase-option__sublabel">$<?php echo esc_html( number_format( (float) $digital_price, 2 ) ); ?> - Instant Access</span>
+                            </span>
+                            <span class="purchase-option__arrow">→</span>
+                        </button>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <?php if ( $free_chapter ) : ?>
+                    <div class="book-hero__free-chapter">
+                        <button type="button" class="btn btn--free-chapter" data-free-chapter data-book-id="<?php echo esc_attr( get_the_ID() ); ?>" data-book-title="<?php echo esc_attr( get_the_title() ); ?>">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Get a Free Chapter
+                        </button>
+                    </div>
                     <?php endif; ?>
-                    <a href="<?php echo esc_url( home_url( '/books/' ) ); ?>" class="btn btn--secondary btn--lg">All Books</a>
+                </div>
+                
+                <div class="book-hero__nav">
+                    <a href="<?php echo esc_url( home_url( '/books/' ) ); ?>" class="btn btn--text">← Browse All Books</a>
                 </div>
             </div>
         </div>
@@ -134,7 +197,15 @@ while ( have_posts() ) : the_post();
                     <?php if ( $formats ) : ?>
                     <div class="book-details__meta-item">
                         <dt class="book-details__meta-label">Formats</dt>
-                        <dd class="book-details__meta-value"><?php echo esc_html( $formats ); ?></dd>
+                        <dd class="book-details__meta-value">
+                            <?php 
+                            if ( is_array( $formats ) ) {
+                                echo esc_html( implode( ', ', $formats ) );
+                            } else {
+                                echo esc_html( $formats );
+                            }
+                            ?>
+                        </dd>
                     </div>
                     <?php endif; ?>
                 </dl>

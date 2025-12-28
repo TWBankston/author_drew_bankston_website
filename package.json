@@ -5,9 +5,11 @@
   "scripts": {
     "deploy:theme": "node scripts/deploy-theme.js",
     "deploy:plugin": "node scripts/deploy-plugin.js",
-    "deploy:all": "npm run deploy:theme && npm run deploy:plugin"
+    "deploy:all": "npm run deploy:theme && npm run deploy:plugin",
+    "compare": "node scripts/compare-files.js"
   },
   "dependencies": {
+    "basic-ftp": "^5.0.5",
     "ssh2-sftp-client": "^9.1.0"
   }
 }

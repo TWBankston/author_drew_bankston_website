@@ -42,6 +42,15 @@ class DBC_Meta_Boxes {
             'default'
         );
         
+        add_meta_box(
+            'dbc_book_purchase',
+            'Purchase Options (Direct Sales)',
+            array( __CLASS__, 'render_book_purchase' ),
+            'book',
+            'normal',
+            'default'
+        );
+        
         // Event meta boxes
         add_meta_box(
             'dbc_event_details',
@@ -120,6 +129,18 @@ class DBC_Meta_Boxes {
             <tr>
                 <th><label for="dbc_book_featured">Featured Book</label></th>
                 <td><input type="checkbox" id="dbc_book_featured" name="dbc_book_featured" value="1" <?php checked( $featured, '1' ); ?>> Display in featured sections</td>
+            </tr>
+        </table>
+        
+        <h4 style="margin-top: 20px;">Free Chapter</h4>
+        <table class="form-table">
+            <?php $free_chapter = get_post_meta( $post->ID, '_dbc_book_free_chapter', true ); ?>
+            <tr>
+                <th><label for="dbc_book_free_chapter">Free Chapter Filename</label></th>
+                <td>
+                    <input type="text" id="dbc_book_free_chapter" name="dbc_book_free_chapter" value="<?php echo esc_attr( $free_chapter ); ?>" class="regular-text" placeholder="e.g., Free Chapter - Khizara.pdf">
+                    <p class="description">Enter the filename of the PDF in <code>/theme/assets/free chapters/</code></p>
+                </td>
             </tr>
         </table>
         <?php
@@ -227,6 +248,51 @@ class DBC_Meta_Boxes {
         <?php
     }
     
+    public static function render_book_purchase( $post ) {
+        $signed_enabled = get_post_meta( $post->ID, '_dbc_book_signed_enabled', true );
+        $signed_price   = get_post_meta( $post->ID, '_dbc_book_signed_price', true );
+        $digital_enabled = get_post_meta( $post->ID, '_dbc_book_digital_enabled', true );
+        $digital_price  = get_post_meta( $post->ID, '_dbc_book_digital_price', true );
+        $digital_file   = get_post_meta( $post->ID, '_dbc_book_digital_file', true );
+        ?>
+        <p class="description">Configure direct sales options. These connect to Square payment processing.</p>
+        
+        <h4 style="margin-top: 15px;">Signed Paperback Copy</h4>
+        <table class="form-table">
+            <tr>
+                <th><label for="dbc_book_signed_enabled">Enable Signed Copy Sales</label></th>
+                <td><input type="checkbox" id="dbc_book_signed_enabled" name="dbc_book_signed_enabled" value="1" <?php checked( $signed_enabled, '1' ); ?>> Allow customers to purchase signed copies</td>
+            </tr>
+            <tr>
+                <th><label for="dbc_book_signed_price">Price (USD)</label></th>
+                <td>
+                    <input type="number" id="dbc_book_signed_price" name="dbc_book_signed_price" value="<?php echo esc_attr( $signed_price ); ?>" class="small-text" step="0.01" min="0">
+                    <span class="description">+ Shipping & Handling</span>
+                </td>
+            </tr>
+        </table>
+        
+        <h4 style="margin-top: 20px;">Digital Copy (eBook/PDF)</h4>
+        <table class="form-table">
+            <tr>
+                <th><label for="dbc_book_digital_enabled">Enable Digital Sales</label></th>
+                <td><input type="checkbox" id="dbc_book_digital_enabled" name="dbc_book_digital_enabled" value="1" <?php checked( $digital_enabled, '1' ); ?>> Allow customers to purchase digital copies</td>
+            </tr>
+            <tr>
+                <th><label for="dbc_book_digital_price">Price (USD)</label></th>
+                <td><input type="number" id="dbc_book_digital_price" name="dbc_book_digital_price" value="<?php echo esc_attr( $digital_price ); ?>" class="small-text" step="0.01" min="0"></td>
+            </tr>
+            <tr>
+                <th><label for="dbc_book_digital_file">Digital File</label></th>
+                <td>
+                    <input type="text" id="dbc_book_digital_file" name="dbc_book_digital_file" value="<?php echo esc_attr( $digital_file ); ?>" class="regular-text" placeholder="e.g., imagination-stone-ebook.pdf">
+                    <p class="description">Filename in <code>/theme/assets/digital-books/</code> - available after purchase in My Account</p>
+                </td>
+            </tr>
+        </table>
+        <?php
+    }
+    
     public static function render_event_details( $post ) {
         wp_nonce_field( 'dbc_event_meta', 'dbc_event_meta_nonce' );
         
@@ -319,6 +385,11 @@ class DBC_Meta_Boxes {
         $featured = isset( $_POST['dbc_book_featured'] ) ? '1' : '';
         update_post_meta( $post_id, '_dbc_book_featured', $featured );
         
+        // Free chapter filename
+        if ( isset( $_POST['dbc_book_free_chapter'] ) ) {
+            update_post_meta( $post_id, '_dbc_book_free_chapter', sanitize_file_name( $_POST['dbc_book_free_chapter'] ) );
+        }
+        
         // Retailer URLs
         $url_fields = array(
             'dbc_book_amazon_url'    => '_dbc_book_amazon_url',
@@ -334,6 +405,25 @@ class DBC_Meta_Boxes {
             if ( isset( $_POST[ $post_key ] ) ) {
                 update_post_meta( $post_id, $meta_key, esc_url_raw( $_POST[ $post_key ] ) );
             }
+        }
+        
+        // Purchase options
+        $signed_enabled = isset( $_POST['dbc_book_signed_enabled'] ) ? '1' : '';
+        update_post_meta( $post_id, '_dbc_book_signed_enabled', $signed_enabled );
+        
+        if ( isset( $_POST['dbc_book_signed_price'] ) ) {
+            update_post_meta( $post_id, '_dbc_book_signed_price', sanitize_text_field( $_POST['dbc_book_signed_price'] ) );
+        }
+        
+        $digital_enabled = isset( $_POST['dbc_book_digital_enabled'] ) ? '1' : '';
+        update_post_meta( $post_id, '_dbc_book_digital_enabled', $digital_enabled );
+        
+        if ( isset( $_POST['dbc_book_digital_price'] ) ) {
+            update_post_meta( $post_id, '_dbc_book_digital_price', sanitize_text_field( $_POST['dbc_book_digital_price'] ) );
+        }
+        
+        if ( isset( $_POST['dbc_book_digital_file'] ) ) {
+            update_post_meta( $post_id, '_dbc_book_digital_file', sanitize_file_name( $_POST['dbc_book_digital_file'] ) );
         }
         
         // Reviews
@@ -404,4 +494,5 @@ class DBC_Meta_Boxes {
         update_post_meta( $post_id, '_dbc_event_is_virtual', $is_virtual );
     }
 }
+
 

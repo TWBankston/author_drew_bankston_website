@@ -111,3 +111,4 @@ $primary_genre = get_term_meta( $term->term_id, 'primary_genre', true );
 <?php
 get_footer();
 
+

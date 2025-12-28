@@ -49,15 +49,21 @@ get_header();
     </div>
 </section>
 
-<!-- Section Divider -->
-<div class="section-divider" aria-hidden="true">
+<!-- Section Divider with Magic Animation (plays once) -->
+<div class="section-divider" role="presentation">
     <lottie-player 
-        src="<?php echo esc_url( DBT_URL . '/assets/lottie/constellation-line.json' ); ?>"
+        src="<?php echo esc_url( DBT_URL . '/assets/lottie/magic-divider.json' ); ?>"
         background="transparent"
-        speed="0.3"
-        loop="true"
-        autoplay="true">
+        speed="1"
+        autoplay
+        mode="normal"
+        aria-label="Magical divider animation"
+        class="section-divider__animation">
     </lottie-player>
+    <!-- Fallback for browsers without Lottie support -->
+    <noscript>
+        <div class="section-divider__fallback"></div>
+    </noscript>
 </div>
 
 <!-- Tokorel Series Section -->
@@ -160,10 +166,8 @@ get_header();
             <?php while ( $standalone_books->have_posts() ) : $standalone_books->the_post(); 
                 $tagline = get_post_meta( get_the_ID(), '_dbc_book_tagline', true );
                 $genre_display = dbt_get_book_genre( get_the_ID() );
-                $standalone_label = ! empty( $genre_display ) ? 'Standalone ' . $genre_display : 'Standalone';
             ?>
             <article class="book-card standalone-card">
-                <span class="standalone-card__genre-label"><?php echo esc_html( $standalone_label ); ?></span>
                 <div class="book-card__cover">
                     <?php if ( has_post_thumbnail() ) : ?>
                         <a href="<?php the_permalink(); ?>">

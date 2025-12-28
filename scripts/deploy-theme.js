@@ -1,6 +1,6 @@
 /**
  * Drew Bankston Theme Deployment Script (SFTP)
- * Deploys the theme folder to the remote WordPress installation via SSH/SFTP
+ * Deploys the theme folder to the remote WordPress installation via SFTP
  */
 
 const SftpClient = require('ssh2-sftp-client');
@@ -35,20 +35,23 @@ async function deploy() {
             host: config.host,
             port: config.port,
             username: config.username,
-            password: config.password,
-            // If using SSH key instead:
-            // privateKey: config.privateKey
+            password: config.password
         });
         console.log('✅ Connected successfully!');
         console.log('');
 
-        // Check if remote directory exists, create if not
-        console.log('📁 Ensuring remote directory exists...');
-        const exists = await sftp.exists(remotePath);
-        if (!exists) {
-            await sftp.mkdir(remotePath, true);
-            console.log('   Created remote directory.');
+        // Clean deployment - remove old files first
+        console.log('🗑️  Removing old theme files...');
+        try {
+            await sftp.rmdir(remotePath, true);
+            console.log('✅ Old files removed.');
+        } catch (e) {
+            console.log('📝 No existing files to remove (or first deploy).');
         }
+        
+        // Ensure remote directory exists
+        console.log('📁 Creating remote directory...');
+        await sftp.mkdir(remotePath, true);
 
         // Upload directory
         console.log('📤 Uploading theme files...');
@@ -59,10 +62,7 @@ async function deploy() {
         console.log('');
         console.log('✅ Theme deployed successfully!');
         console.log('');
-        console.log('Next steps:');
-        console.log('1. Log into WordPress admin');
-        console.log('2. Go to Appearance > Themes');
-        console.log('3. Activate the "Drew Bankston" theme');
+        console.log('Site: https://dbankston.wordkeeper.net/');
 
     } catch (err) {
         console.error('❌ Deployment failed:', err.message);
