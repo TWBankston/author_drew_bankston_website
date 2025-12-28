@@ -140,7 +140,7 @@ foreach ( $cart as $item ) {
                     <div class="checkout-account-prompt">
                         <div class="checkout-account-prompt__toggle">
                             <label class="checkbox-label checkbox-label--featured">
-                                <input type="checkbox" name="create_account" id="create_account" value="1">
+                                <input type="checkbox" name="create_account" id="create_account" value="1" checked>
                                 <span>Create an account for a better experience</span>
                             </label>
                         </div>
@@ -169,7 +169,7 @@ foreach ( $cart as $item ) {
                             </ul>
                         </div>
                         
-                        <div class="checkout-account-prompt__fields" id="account-fields" style="display: none;">
+                        <div class="checkout-account-prompt__fields" id="account-fields">
                             <div class="form-group">
                                 <label for="account_password">Create Password *</label>
                                 <input type="password" id="account_password" name="account_password" minlength="8" 
@@ -400,23 +400,40 @@ document.querySelector('input[name="signature_request"]')?.addEventListener('cha
 });
 
 // Toggle account creation fields
-document.getElementById('create_account')?.addEventListener('change', function() {
-    const accountFields = document.getElementById('account-fields');
-    const passwordInput = document.getElementById('account_password');
-    const passwordConfirm = document.getElementById('account_password_confirm');
+const createAccountCheckbox = document.getElementById('create_account');
+const accountFields = document.getElementById('account-fields');
+const passwordInput = document.getElementById('account_password');
+const passwordConfirm = document.getElementById('account_password_confirm');
+
+function updateAccountFields(checked) {
+    if (!accountFields) return;
     
-    if (this.checked) {
+    if (checked) {
         accountFields.style.display = 'block';
-        passwordInput.required = true;
-        passwordConfirm.required = true;
+        if (passwordInput) passwordInput.required = true;
+        if (passwordConfirm) passwordConfirm.required = true;
     } else {
         accountFields.style.display = 'none';
-        passwordInput.required = false;
-        passwordConfirm.required = false;
-        passwordInput.value = '';
-        passwordConfirm.value = '';
+        if (passwordInput) {
+            passwordInput.required = false;
+            passwordInput.value = '';
+        }
+        if (passwordConfirm) {
+            passwordConfirm.required = false;
+            passwordConfirm.value = '';
+        }
     }
-});
+}
+
+// Ensure checkbox is always checked on page load (override browser form restoration)
+if (createAccountCheckbox) {
+    createAccountCheckbox.checked = true;
+    updateAccountFields(true);
+    
+    createAccountCheckbox.addEventListener('change', function() {
+        updateAccountFields(this.checked);
+    });
+}
 
 // Mobile summary toggle
 document.getElementById('mobile-summary-toggle')?.addEventListener('click', function() {
