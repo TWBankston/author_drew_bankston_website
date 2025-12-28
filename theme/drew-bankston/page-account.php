@@ -83,7 +83,9 @@ if ( isset( $_POST['dbc_change_password'] ) && wp_verify_nonce( $_POST['dbc_pass
         <div class="hero__bg"></div>
         <div class="container">
             <div class="hero__content gsap-reveal" style="text-align: center; max-width: 100%;">
-                <h1 class="hero__title">My Account</h1>
+                <h1 class="hero__title hero__title--typewriter" data-typewriter-text="My Account">
+                    <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+                </h1>
                 <p class="hero__subtitle">Welcome back, <?php echo esc_html( $current_user->display_name ); ?>!</p>
             </div>
         </div>

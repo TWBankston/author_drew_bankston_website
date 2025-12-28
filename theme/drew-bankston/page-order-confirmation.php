@@ -20,7 +20,9 @@ $order_id = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : ''
                     <polyline points="22 4 12 14.01 9 11.01"/>
                 </svg>
             </div>
-            <h1 class="hero__title">Thank You!</h1>
+            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="Thank You!">
+                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+            </h1>
             <p class="hero__subtitle">Your order has been placed successfully</p>
         </div>
     </div>

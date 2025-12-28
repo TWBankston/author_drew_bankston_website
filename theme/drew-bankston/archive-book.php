@@ -12,7 +12,9 @@ get_header();
     <div class="container">
         <div class="hero__content gsap-reveal" style="text-align: center; max-width: 100%;">
             <p class="hero__eyebrow">Library</p>
-            <h1 class="hero__title">All Books</h1>
+            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="All Books">
+                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+            </h1>
             <p class="hero__subtitle">Explore Drew Bankston's complete collection of science fiction, fantasy, and non-fiction works.</p>
         </div>
     </div>

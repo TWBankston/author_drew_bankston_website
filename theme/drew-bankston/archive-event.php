@@ -12,7 +12,9 @@ get_header();
     <div class="container">
         <div class="hero__content gsap-reveal" style="text-align: center; max-width: 100%;">
             <p class="hero__eyebrow">Appearances</p>
-            <h1 class="hero__title">Events</h1>
+            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="Events">
+                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+            </h1>
             <p class="hero__subtitle">Meet Drew at book signings, readings, panels, and conventions.</p>
         </div>
     </div>

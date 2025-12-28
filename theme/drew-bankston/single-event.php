@@ -26,7 +26,9 @@ while ( have_posts() ) : the_post();
             <?php if ( $event_type ) : ?>
                 <p class="hero__eyebrow"><?php echo esc_html( ucwords( str_replace( '-', ' ', $event_type ) ) ); ?></p>
             <?php endif; ?>
-            <h1 class="hero__title"><?php the_title(); ?></h1>
+            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="<?php the_title(); ?>">
+                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+            </h1>
             <p class="hero__subtitle">
                 <?php echo date( 'l, F j, Y', $event_date ); ?>
                 <?php if ( $location_name ) : ?>

@@ -14,7 +14,9 @@ $term = get_queried_object();
     <div class="container">
         <div class="hero__content gsap-reveal" style="text-align: center; max-width: 100%;">
             <p class="hero__eyebrow">Genre</p>
-            <h1 class="hero__title"><?php single_term_title(); ?></h1>
+            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="<?php single_term_title(); ?>">
+                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+            </h1>
             <?php if ( term_description() ) : ?>
                 <p class="hero__subtitle"><?php echo term_description(); ?></p>
             <?php endif; ?>

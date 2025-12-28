@@ -11,7 +11,9 @@ get_header();
     <div class="container">
         <div class="hero__content gsap-reveal" style="text-align: center; max-width: 100%;">
             <p class="hero__eyebrow">Error 404</p>
-            <h1 class="hero__title">Page Not Found</h1>
+            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="Page Not Found">
+                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+            </h1>
             <p class="hero__subtitle">The page you're looking for seems to have drifted into another dimension. Let's get you back on course.</p>
             
             <div class="hero__cta" style="justify-content: center; margin-top: var(--space-8);">

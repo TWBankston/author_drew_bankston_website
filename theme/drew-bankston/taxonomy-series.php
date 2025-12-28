@@ -25,7 +25,9 @@ $primary_genre = get_term_meta( $term->term_id, 'primary_genre', true );
     <div class="container">
         <div class="hero__content gsap-reveal" style="text-align: center; max-width: 100%;">
             <p class="hero__eyebrow">Book Series</p>
-            <h1 class="hero__title"><?php single_term_title(); ?></h1>
+            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="<?php single_term_title(); ?>">
+                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+            </h1>
             <?php if ( $primary_genre ) : ?>
                 <div class="hero__genres" style="justify-content: center;">
                     <span class="hero__genre-tag"><?php echo esc_html( $primary_genre ); ?></span>

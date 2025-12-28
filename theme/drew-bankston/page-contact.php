@@ -11,7 +11,9 @@ get_header();
     <div class="hero__bg"></div>
     <div class="container">
         <div class="hero__content gsap-reveal" style="text-align: center; max-width: 100%;">
-            <h1 class="hero__title">Contact</h1>
+            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="Contact">
+                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+            </h1>
             <p class="hero__subtitle">Have a question, want to book an event, or just want to say hello? Get in touch!</p>
         </div>
     </div>

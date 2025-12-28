@@ -18,7 +18,9 @@ $has_physical = DBC_Cart::has_physical_items();
 <section class="hero hero--compact">
     <div class="container">
         <div class="hero__content hero__content--centered">
-            <h1 class="hero__title">Your Cart</h1>
+            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="Your Cart">
+                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+            </h1>
             <p class="hero__subtitle" id="cart-page-count"><?php echo $cart_count; ?> item<?php echo $cart_count !== 1 ? 's' : ''; ?> in your cart</p>
         </div>
     </div>

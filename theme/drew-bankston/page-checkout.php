@@ -36,7 +36,9 @@ foreach ( $cart as $item ) {
 <section class="hero hero--compact">
     <div class="container">
         <div class="hero__content hero__content--centered">
-            <h1 class="hero__title">Checkout</h1>
+            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="Checkout">
+                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+            </h1>
             <p class="hero__subtitle">Complete your order</p>
         </div>
     </div>

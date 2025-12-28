@@ -12,7 +12,9 @@ get_header();
     <div class="container">
         <div class="hero__content gsap-reveal" style="text-align: center; max-width: 100%;">
             <p class="hero__eyebrow">News & Updates</p>
-            <h1 class="hero__title">Blog</h1>
+            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="Blog">
+                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+            </h1>
             <p class="hero__subtitle">Behind-the-scenes updates, writing insights, and announcements from Drew.</p>
         </div>
     </div>

@@ -151,23 +151,31 @@ function dbc_fix_free_chapter_filenames() {
     );
     
     $output = '<h2>Fixing Free Chapter Filenames</h2><ul>';
+    $files_dir = get_template_directory() . '/assets/free chapters/';
     
     foreach ( $chapter_files as $slug => $filename ) {
         $book = get_page_by_path( $slug, OBJECT, 'book' );
         
         if ( $book ) {
+            // Delete any existing meta first to ensure clean update
+            delete_post_meta( $book->ID, '_dbc_book_free_chapter' );
             update_post_meta( $book->ID, '_dbc_book_free_chapter', $filename );
-            $output .= '<li>✅ Updated <strong>' . esc_html( $book->post_title ) . '</strong>: ' . esc_html( $filename ) . '</li>';
+            
+            // Check if file actually exists
+            $file_exists = file_exists( $files_dir . $filename ) ? '✅ File exists' : '⚠️ File NOT found';
+            $output .= '<li>✅ Updated <strong>' . esc_html( $book->post_title ) . '</strong>: ' . esc_html( $filename ) . ' (' . $file_exists . ')</li>';
         } else {
             $output .= '<li>⚠️ Book not found: ' . esc_html( $slug ) . '</li>';
         }
     }
     
-    $output .= '</ul><p><a href="' . home_url( '/account/' ) . '">Test Downloads →</a></p>';
+    $output .= '</ul>';
+    $output .= '<p><strong>Files directory:</strong> ' . esc_html( $files_dir ) . '</p>';
+    $output .= '<p><a href="' . home_url( '/account/' ) . '">Test Downloads →</a></p>';
     
     wp_die( $output, 'Free Chapter Filenames Fixed', array( 'response' => 200 ) );
 }
-add_action( 'admin_init', 'dbc_fix_free_chapter_filenames' );
+add_action( 'init', 'dbc_fix_free_chapter_filenames', 1 ); // Run early on init hook
 
 /**
  * Admin action to fix book formats stored as arrays
