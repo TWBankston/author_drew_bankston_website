@@ -194,7 +194,7 @@ function dbt_login_styles() {
         
         .login #nav a:hover,
         .login #backtoblog a:hover {
-            color: #d4c7ff;
+            color: #c7b8ff;
             text-decoration: underline;
             text-decoration-color: #c7b8ff;
             text-underline-offset: 3px;
