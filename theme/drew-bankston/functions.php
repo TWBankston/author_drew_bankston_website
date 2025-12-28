@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.1.8' );
+define( 'DBT_VERSION', '3.1.9' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -277,7 +277,7 @@ function dbt_login_styles() {
         .login-divider {
             display: flex;
             align-items: center;
-            margin: 24px 0;
+            margin: 16px 0;
             color: rgba(255, 255, 255, 0.4);
             font-size: 13px;
         }
@@ -337,13 +337,24 @@ function dbt_login_styles() {
         
         /* Reorder register form elements */
         #registerform .user-email-wrap { order: 1; }
-        #registerform .submit { order: 2; }
-        #registerform .login-inline-action { order: 3; }
-        #registerform #reg_passmail { order: 4; }
+        #registerform #reg_passmail { order: 2; }
+        #registerform .submit { order: 3; }
+        #registerform .login-inline-action { order: 4; }
+        
+        /* Hide tooltip until fields are filled */
+        #registerform #reg_passmail {
+            display: none;
+            margin-top: 16px;
+            margin-bottom: 0;
+        }
+        
+        #registerform #reg_passmail.visible {
+            display: block;
+        }
         
         /* Inline action section (inside form) */
         .login-inline-action {
-            margin-top: 20px;
+            margin-top: 8px;
             text-align: center;
             width: 100%;
         }
@@ -351,11 +362,15 @@ function dbt_login_styles() {
         .login-inline-action p,
         .login-inline-hint {
             color: rgba(255, 255, 255, 0.6) !important;
-            margin: 0 0 12px !important;
+            margin: 8px 0 !important;
             font-size: 13px !important;
             background: none !important;
             border: none !important;
             padding: 0 !important;
+        }
+        
+        .login-inline-action .login-secondary-button {
+            margin-top: 4px;
         }
         
         /* Additional action box (outside form - for register/lostpassword pages) */
@@ -430,6 +445,36 @@ function dbt_login_styles() {
             margin-top: 8px;
         }
     </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Only run on registration page
+        var registerForm = document.getElementById('registerform');
+        if (!registerForm) return;
+        
+        var userLogin = document.getElementById('user_login');
+        var userEmail = document.getElementById('user_email');
+        var regPassmail = document.getElementById('reg_passmail');
+        
+        if (!userLogin || !userEmail || !regPassmail) return;
+        
+        function checkFields() {
+            var usernameValid = userLogin.value.trim().length > 0;
+            var emailValid = userEmail.value.trim().length > 0 && userEmail.value.includes('@');
+            
+            if (usernameValid && emailValid) {
+                regPassmail.classList.add('visible');
+            } else {
+                regPassmail.classList.remove('visible');
+            }
+        }
+        
+        userLogin.addEventListener('input', checkFields);
+        userEmail.addEventListener('input', checkFields);
+        
+        // Check on page load in case of browser autofill
+        setTimeout(checkFields, 100);
+    });
+    </script>
     <?php
 }
 add_action( 'login_enqueue_scripts', 'dbt_login_styles' );
