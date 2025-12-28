@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.2.2' );
+define( 'DBT_VERSION', '3.2.3' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -441,12 +441,49 @@ function dbt_login_styles() {
         }
         
         /* Registration confirmation message */
-        .login .message.register {
-            background: rgba(26, 18, 48, 0.9);
-            border-left: 4px solid #c7b8ff;
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.9);
-            padding: 12px 16px;
+        .login .message.register,
+        .login .message {
+            background: rgba(26, 18, 48, 0.9) !important;
+            border-left: 4px solid #c7b8ff !important;
+            border-radius: 8px !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 12px 16px !important;
+        }
+        
+        .login .message a {
+            color: #c7b8ff !important;
+            text-decoration: underline;
+        }
+        
+        .login .message a:hover {
+            color: #fff !important;
+        }
+        
+        /* Check email confirmation page */
+        .login.action-checkemail #login {
+            background: transparent;
+        }
+        
+        .login.action-checkemail #login > p {
+            background: rgba(26, 18, 48, 0.95) !important;
+            border: 1px solid rgba(199, 184, 255, 0.15) !important;
+            border-radius: 16px !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 24px !important;
+            text-align: center;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        .login.action-checkemail #login > p a {
+            color: #c7b8ff !important;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .login.action-checkemail #login > p a:hover {
+            color: #fff !important;
+            text-decoration: underline;
         }
         
         /* Description text under inputs on registration */
