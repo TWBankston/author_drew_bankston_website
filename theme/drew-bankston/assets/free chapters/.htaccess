@@ -1,0 +1,7 @@
+# Deny all direct access to PDF files in this folder
+# Downloads must go through the secure PHP handler
+<FilesMatch "\.pdf$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+

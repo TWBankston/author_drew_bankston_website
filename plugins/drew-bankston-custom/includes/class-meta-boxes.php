@@ -120,7 +120,7 @@ class DBC_Meta_Boxes {
             </tr>
             <tr>
                 <th><label for="dbc_book_formats">Available Formats</label></th>
-                <td><input type="text" id="dbc_book_formats" name="dbc_book_formats" value="<?php echo esc_attr( $formats ); ?>" class="regular-text" placeholder="e.g., Paperback, eBook, Audiobook"></td>
+                <td><input type="text" id="dbc_book_formats" name="dbc_book_formats" value="<?php echo esc_attr( is_array( $formats ) ? implode( ', ', $formats ) : $formats ); ?>" class="regular-text" placeholder="e.g., Paperback, eBook, Audiobook"></td>
             </tr>
             <tr>
                 <th><label for="dbc_book_series_order">Series Order</label></th>
