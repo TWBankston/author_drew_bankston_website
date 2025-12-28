@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.1.3' );
+define( 'DBT_VERSION', '3.1.4' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -379,17 +379,14 @@ function dbt_login_footer_content() {
     
     // Only show on login page, not on register or lostpassword
     if ( $action === 'login' || empty( $action ) ) {
-        // Check if registration is enabled
-        if ( get_option( 'users_can_register' ) ) {
-            ?>
-            <div class="login-action-box">
-                <p>Don't have an account?</p>
-                <a href="<?php echo esc_url( wp_registration_url() ); ?>" class="login-secondary-button">
-                    Create an Account
-                </a>
-            </div>
-            <?php
-        }
+        ?>
+        <div class="login-action-box">
+            <p>Don't have an account?</p>
+            <a href="<?php echo esc_url( wp_registration_url() ); ?>" class="login-secondary-button">
+                Create an Account
+            </a>
+        </div>
+        <?php
     }
     
     // Show login button on registration page
