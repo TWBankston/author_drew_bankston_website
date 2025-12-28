@@ -47,7 +47,12 @@
                             Account
                         </a>
                     <?php else : ?>
-                        <a href="<?php echo esc_url( wp_login_url( home_url( '/account/' ) ) ); ?>" class="btn btn--secondary btn--sm header-login-btn">Sign In</a>
+                        <?php 
+                        // Redirect back to current page after login (or account page if on login/register)
+                        $current_url = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+                        $redirect_url = strpos( $current_url, 'wp-login.php' ) !== false ? home_url( '/account/' ) : $current_url;
+                        ?>
+                        <a href="<?php echo esc_url( wp_login_url( $redirect_url ) ); ?>" class="btn btn--secondary btn--sm header-login-btn">Sign In</a>
                     <?php endif; ?>
                     <a href="<?php echo esc_url( home_url( '/books/' ) ); ?>" class="btn btn--primary">View All Books</a>
                 </div>
@@ -76,7 +81,7 @@
             <li><a href="<?php echo esc_url( home_url( '/account/' ) ); ?>">My Account</a></li>
             <li><a href="<?php echo esc_url( wp_logout_url( home_url() ) ); ?>">Sign Out</a></li>
         <?php else : ?>
-            <li><a href="<?php echo esc_url( wp_login_url( home_url( '/account/' ) ) ); ?>">Sign In</a></li>
+            <li><a href="<?php echo esc_url( wp_login_url( $redirect_url ) ); ?>">Sign In</a></li>
         <?php endif; ?>
     </ul>
 </nav>

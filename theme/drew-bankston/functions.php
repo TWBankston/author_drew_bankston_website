@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.2.8' );
+define( 'DBT_VERSION', '3.2.9' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -627,6 +627,49 @@ function dbt_login_logo_title() {
     return get_bloginfo( 'name' ) . ' - Author';
 }
 add_filter( 'login_headertext', 'dbt_login_logo_title' );
+
+/**
+ * Custom login redirect - send users back to the page they came from
+ */
+function dbt_login_redirect( $redirect_to, $requested_redirect_to, $user ) {
+    // If there's an error, don't redirect
+    if ( is_wp_error( $user ) ) {
+        return $redirect_to;
+    }
+    
+    // If a specific redirect was requested (via redirect_to parameter), use it
+    if ( ! empty( $requested_redirect_to ) ) {
+        return $requested_redirect_to;
+    }
+    
+    // Default: redirect to account page instead of admin dashboard
+    return home_url( '/account/' );
+}
+add_filter( 'login_redirect', 'dbt_login_redirect', 10, 3 );
+
+/**
+ * Custom registration redirect - send users back to the page they came from
+ */
+function dbt_registration_redirect( $redirect_to ) {
+    // Check if there's a redirect_to in the URL
+    if ( isset( $_REQUEST['redirect_to'] ) && ! empty( $_REQUEST['redirect_to'] ) ) {
+        return esc_url_raw( $_REQUEST['redirect_to'] );
+    }
+    
+    // Default: redirect to account page
+    return home_url( '/account/' );
+}
+add_filter( 'registration_redirect', 'dbt_registration_redirect' );
+
+/**
+ * Pass redirect_to parameter through registration form
+ */
+function dbt_add_redirect_to_registration() {
+    if ( isset( $_GET['redirect_to'] ) && ! empty( $_GET['redirect_to'] ) ) {
+        echo '<input type="hidden" name="redirect_to" value="' . esc_attr( $_GET['redirect_to'] ) . '" />';
+    }
+}
+add_action( 'register_form', 'dbt_add_redirect_to_registration' );
 
 /**
  * Enqueue scripts and styles
