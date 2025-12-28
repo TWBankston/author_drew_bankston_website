@@ -260,8 +260,11 @@
      * Staggers: 1) Title typewriter, 2) Quill fade-in, 3) Divider animation
      */
     function initHeroAnimationSequence() {
-        const heroTitle = document.querySelector('.hero__title');
+        // Only run on homepage (check for quill container which only exists on homepage)
         const quillContainer = document.querySelector('.hero__quill-container');
+        if (!quillContainer) return; // Exit if not on homepage
+        
+        const heroTitle = document.querySelector('.hero__title');
         const dividerPlayer = document.getElementById('magic-divider');
         
         // Track if divider animation has been triggered
