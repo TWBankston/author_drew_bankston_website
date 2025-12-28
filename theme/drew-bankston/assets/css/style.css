@@ -2933,11 +2933,17 @@ lottie-player {
 }
 
 .cart-item__image img {
-    width: 80px;
-    height: auto;
-    max-height: 120px;
+    width: 70px;
+    height: 105px;
     object-fit: contain;
     border-radius: var(--radius-md);
+}
+
+@media (max-width: 768px) {
+    .cart-item__image img {
+        width: 60px;
+        height: 90px;
+    }
 }
 
 .cart-item__name {

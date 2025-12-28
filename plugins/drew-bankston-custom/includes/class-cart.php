@@ -110,7 +110,7 @@ class DBC_Cart {
                 'name'         => $product_name,
                 'price'        => $price,
                 'quantity'     => ( $type === 'digital' ) ? 1 : $quantity,
-                'thumbnail'    => get_the_post_thumbnail_url( $book_id, 'thumbnail' ),
+                'thumbnail'    => get_the_post_thumbnail_url( $book_id, 'medium' ),
             );
         }
         
