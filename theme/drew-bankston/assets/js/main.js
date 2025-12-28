@@ -257,51 +257,50 @@
 
     /**
      * Hero Animation Sequence Controller
-     * Staggers: 1) Title typewriter, 2) Quill fade-in, 3) Divider animation
+     * For homepage: Staggers 1) Title typewriter, 2) Quill fade-in, 3) Divider animation
+     * For interior pages: Just title typewriter with page title
      */
     function initHeroAnimationSequence() {
-        // Only run on homepage (check for quill container which only exists on homepage)
-        const quillContainer = document.querySelector('.hero__quill-container');
-        if (!quillContainer) return; // Exit if not on homepage
-        
         const heroTitle = document.querySelector('.hero__title');
+        const quillContainer = document.querySelector('.hero__quill-container');
         const dividerPlayer = document.getElementById('magic-divider');
+        const isHomepage = !!quillContainer; // Homepage has the quill container
+        
+        if (!heroTitle) return;
         
         // Track if divider animation has been triggered
         let dividerAnimationTriggered = false;
         
-        // Initially hide quill
-        if (quillContainer) {
+        // Get the actual page title from the element
+        const pageTitle = heroTitle.textContent.trim() || 'Drew Bankston';
+        
+        // Initially hide quill on homepage
+        if (isHomepage && quillContainer) {
             quillContainer.style.opacity = '0';
             quillContainer.style.transition = 'opacity 0.8s ease-out';
         }
         
-        // Calculate when title typing will finish (approx)
-        const titleText = 'Drew Bankston';
-        const typingDuration = 300 + (titleText.length * 80) + 500; // startDelay + chars * speed + buffer
-        
-        // Step 1: Start title typewriter
-        if (heroTitle) {
-            initTypewriter(heroTitle, {
-                typingSpeed: 80,
-                startDelay: 300,
-                cursorGlowAfter: true,
-                text: titleText,
-                onComplete: function() {
-                    // Step 2: Fade in quill after title completes
-                    if (quillContainer) {
+        // Initialize typewriter with appropriate settings
+        initTypewriter(heroTitle, {
+            typingSpeed: isHomepage ? 80 : 60, // Slightly faster for shorter titles
+            startDelay: 300,
+            cursorGlowAfter: isHomepage, // Glow effect only on homepage
+            cursorBlinkAfter: !isHomepage, // Regular blink on interior pages
+            text: pageTitle,
+            onComplete: function() {
+                // Homepage: Continue with quill and divider animations
+                if (isHomepage && quillContainer) {
+                    setTimeout(function() {
+                        quillContainer.style.opacity = '1';
+                        
+                        // Step 3: Check if divider is in viewport
                         setTimeout(function() {
-                            quillContainer.style.opacity = '1';
-                            
-                            // Step 3: Check if divider is in viewport
-                            setTimeout(function() {
-                                checkAndPlayDivider();
-                            }, 800); // Wait for quill fade-in
-                        }, 200); // Small delay after typing
-                    }
+                            checkAndPlayDivider();
+                        }, 800); // Wait for quill fade-in
+                    }, 200); // Small delay after typing
                 }
-            });
-        }
+            }
+        });
         
         // Function to play divider animation
         function playDivider() {
