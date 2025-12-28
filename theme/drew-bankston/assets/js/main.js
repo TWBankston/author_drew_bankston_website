@@ -788,16 +788,31 @@
         } else {
             itemsHtml = '<div class="cart-drawer__items">';
             for (const [key, item] of Object.entries(cartData.cart)) {
+                const isDigital = item.type === 'digital';
+                const qtyControls = isDigital 
+                    ? `<span class="cart-drawer__item-qty">Qty: ${item.quantity}</span>`
+                    : `<div class="cart-drawer__qty-control">
+                        <button type="button" class="cart-drawer__qty-btn" data-action="decrease" data-key="${key}">−</button>
+                        <span class="cart-drawer__qty-value">${item.quantity}</span>
+                        <button type="button" class="cart-drawer__qty-btn" data-action="increase" data-key="${key}">+</button>
+                       </div>`;
+                
                 itemsHtml += `
-                    <div class="cart-drawer__item">
+                    <div class="cart-drawer__item" data-cart-key="${key}">
                         <div class="cart-drawer__item-image">
                             ${item.thumbnail ? `<img src="${item.thumbnail}" alt="">` : ''}
                         </div>
                         <div class="cart-drawer__item-info">
                             <div class="cart-drawer__item-name">${item.name}</div>
-                            <div class="cart-drawer__item-type">Qty: ${item.quantity}</div>
+                            ${qtyControls}
                             <div class="cart-drawer__item-price">$${(item.price * item.quantity).toFixed(2)}</div>
                         </div>
+                        <button type="button" class="cart-drawer__item-remove" data-key="${key}" aria-label="Remove item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
                     </div>
                 `;
             }
@@ -844,6 +859,24 @@
         drawer.querySelector('.cart-drawer__close').addEventListener('click', closeCartDrawer);
         drawer.querySelector('.cart-drawer__continue').addEventListener('click', closeCartDrawer);
         
+        // Bind remove item handlers
+        drawer.querySelectorAll('.cart-drawer__item-remove').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const key = this.getAttribute('data-key');
+                removeFromDrawerCart(key, this.closest('.cart-drawer__item'));
+            });
+        });
+        
+        // Bind quantity control handlers
+        drawer.querySelectorAll('.cart-drawer__qty-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const key = this.getAttribute('data-key');
+                const action = this.getAttribute('data-action');
+                const item = this.closest('.cart-drawer__item');
+                updateDrawerQuantity(key, action, item);
+            });
+        });
+        
         // Prevent body scroll
         document.body.style.overflow = 'hidden';
         
@@ -867,6 +900,98 @@
             if (drawer) drawer.remove();
             if (overlay) overlay.remove();
         }, 300);
+    }
+    
+    function removeFromDrawerCart(cartKey, itemElement) {
+        const nonce = typeof dbcAjax !== 'undefined' ? dbcAjax.cartNonce : '';
+        
+        const formData = new FormData();
+        formData.append('action', 'dbc_remove_from_cart');
+        formData.append('cart_key', cartKey);
+        formData.append('nonce', nonce);
+        
+        fetch(dbcAjax.ajaxUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove item from drawer
+                itemElement.remove();
+                
+                // Update cart count in header
+                updateCartCount(data.data.count);
+                
+                // If cart is now empty, show empty message
+                const itemsContainer = document.querySelector('.cart-drawer__items');
+                if (itemsContainer && itemsContainer.children.length === 0) {
+                    itemsContainer.outerHTML = '<div class="cart-drawer__empty">Your cart is empty</div>';
+                }
+                
+                // Update drawer totals
+                updateDrawerTotals(data.data);
+            }
+        })
+        .catch(error => console.error('Error removing item:', error));
+    }
+    
+    function updateDrawerQuantity(cartKey, action, itemElement) {
+        const qtyValue = itemElement.querySelector('.cart-drawer__qty-value');
+        let qty = parseInt(qtyValue.textContent) || 1;
+        
+        if (action === 'increase') qty++;
+        if (action === 'decrease') qty = Math.max(1, qty - 1);
+        
+        qtyValue.textContent = qty;
+        
+        const nonce = typeof dbcAjax !== 'undefined' ? dbcAjax.cartNonce : '';
+        
+        const formData = new FormData();
+        formData.append('action', 'dbc_update_cart_quantity');
+        formData.append('cart_key', cartKey);
+        formData.append('quantity', qty);
+        formData.append('nonce', nonce);
+        
+        fetch(dbcAjax.ajaxUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update item price display
+                const priceEl = itemElement.querySelector('.cart-drawer__item-price');
+                if (priceEl && data.data.item_subtotal !== undefined) {
+                    priceEl.textContent = '$' + data.data.item_subtotal.toFixed(2);
+                }
+                
+                // Update drawer totals
+                updateDrawerTotals(data.data);
+            }
+        })
+        .catch(error => console.error('Error updating quantity:', error));
+    }
+    
+    function updateDrawerTotals(cartData) {
+        const drawer = document.querySelector('.cart-drawer');
+        if (!drawer) return;
+        
+        const rows = drawer.querySelectorAll('.cart-drawer__row');
+        rows.forEach(function(row) {
+            const label = row.querySelector('span:first-child');
+            const value = row.querySelector('span:last-child');
+            
+            if (label && value) {
+                if (label.textContent === 'Subtotal' && cartData.subtotal !== undefined) {
+                    value.textContent = '$' + cartData.subtotal.toFixed(2);
+                } else if (label.textContent === 'Shipping' && cartData.shipping !== undefined) {
+                    value.textContent = '$' + cartData.shipping.toFixed(2);
+                } else if (label.textContent === 'Total' && cartData.total !== undefined) {
+                    value.textContent = '$' + cartData.total.toFixed(2);
+                }
+            }
+        });
     }
 
     function initCartPage() {

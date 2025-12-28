@@ -2914,8 +2914,10 @@ lottie-player {
 
 @media (max-width: 768px) {
     .cart-item {
+        position: relative;
         grid-template-columns: 60px 1fr;
         gap: var(--space-3);
+        padding-right: var(--space-10); /* Make room for remove button */
     }
     
     .cart-item__quantity,
@@ -2925,8 +2927,8 @@ lottie-player {
     
     .cart-item__remove {
         position: absolute;
-        top: var(--space-2);
-        right: var(--space-2);
+        top: var(--space-3);
+        right: var(--space-3);
     }
 }
 
@@ -3818,9 +3820,11 @@ lottie-player {
 }
 
 .cart-drawer__item {
+    position: relative;
     display: flex;
     gap: var(--space-3);
     padding: var(--space-3);
+    padding-right: var(--space-8); /* Make room for remove button */
     background: var(--color-bg-tertiary);
     border-radius: var(--radius-md);
 }
@@ -3860,6 +3864,71 @@ lottie-player {
     font-size: var(--text-sm);
     color: var(--color-accent-lavender);
     margin-top: var(--space-1);
+}
+
+.cart-drawer__item-remove {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: color var(--transition-base);
+    padding: 0;
+}
+
+.cart-drawer__item-remove:hover {
+    color: #f87171;
+}
+
+.cart-drawer__item-remove svg {
+    width: 14px;
+    height: 14px;
+}
+
+.cart-drawer__item-qty {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+}
+
+.cart-drawer__qty-control {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-top: var(--space-1);
+}
+
+.cart-drawer__qty-btn {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    font-size: var(--text-lg);
+    line-height: 1;
+    transition: all var(--transition-base);
+}
+
+.cart-drawer__qty-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.cart-drawer__qty-value {
+    font-size: var(--text-sm);
+    min-width: 20px;
+    text-align: center;
 }
 
 .cart-drawer__footer {
