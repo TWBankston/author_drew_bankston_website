@@ -620,28 +620,25 @@ p:last-child {
 .hero__ambient-orb--violet {
     top: -20%;
     left: -10%;
-    width: 50%;
-    height: 50%;
-    background: rgba(139, 92, 246, 0.1);
-    filter: blur(120px);
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0) 70%);
 }
 
 .hero__ambient-orb--indigo {
-    bottom: 0%;
-    right: -5%;
-    width: 40%;
-    height: 40%;
-    background: rgba(99, 102, 241, 0.1);
-    filter: blur(100px);
+    bottom: -10%;
+    right: -10%;
+    width: 50%;
+    height: 50%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0) 70%);
 }
 
 .hero__ambient-orb--cyan {
-    top: 40%;
-    left: 60%;
-    width: 20%;
-    height: 20%;
-    background: rgba(34, 211, 238, 0.05);
-    filter: blur(80px);
+    top: 35%;
+    left: 55%;
+    width: 30%;
+    height: 30%;
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.08) 0%, rgba(34, 211, 238, 0) 70%);
 }
 
 /* Violet Glowing Cursor */
@@ -650,9 +647,11 @@ p:last-child {
     width: 4px;
     height: 0.85em;
     background-color: #8b5cf6;
-    margin-left: 2px;
+    margin-left: 4px;
     vertical-align: baseline;
     animation: blink 0.7s infinite;
+    text-indent: -9999px; /* Hide the | text character offscreen */
+    line-height: 0;
 }
 
 .hero__title--typewriter .typewriter-cursor.typing {
