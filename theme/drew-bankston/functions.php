@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.1.7' );
+define( 'DBT_VERSION', '3.1.8' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -322,16 +322,40 @@ function dbt_login_styles() {
             color: #fff !important;
         }
         
+        /* Make login form a flex container to reorder elements */
+        #loginform,
+        #registerform {
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        
+        /* Reorder login form elements */
+        #loginform .user-pass-wrap { order: 1; }
+        #loginform .forgetmenot { order: 2; }
+        #loginform .submit { order: 3; }
+        #loginform .login-inline-action { order: 4; }
+        
+        /* Reorder register form elements */
+        #registerform .user-email-wrap { order: 1; }
+        #registerform .submit { order: 2; }
+        #registerform .login-inline-action { order: 3; }
+        #registerform #reg_passmail { order: 4; }
+        
         /* Inline action section (inside form) */
         .login-inline-action {
             margin-top: 20px;
             text-align: center;
+            width: 100%;
         }
         
-        .login-inline-action p {
-            color: rgba(255, 255, 255, 0.5);
-            margin: 0 0 12px;
-            font-size: 13px;
+        .login-inline-action p,
+        .login-inline-hint {
+            color: rgba(255, 255, 255, 0.6) !important;
+            margin: 0 0 12px !important;
+            font-size: 13px !important;
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
         }
         
         /* Additional action box (outside form - for register/lostpassword pages) */
@@ -432,6 +456,7 @@ function dbt_register_form_signin() {
     ?>
     <div class="login-inline-action">
         <div class="login-divider">or</div>
+        <p class="login-inline-hint">Already have an account?</p>
         <a href="<?php echo esc_url( wp_login_url() ); ?>" class="login-secondary-button">
             Sign In
         </a>
