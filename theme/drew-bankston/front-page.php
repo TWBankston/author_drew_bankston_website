@@ -127,11 +127,11 @@ get_header();
         src="<?php echo esc_url( DBT_URL . '/assets/lottie/magic-divider.json' ); ?>"
         background="transparent"
         speed="1"
-        autoplay
         mode="normal"
         aria-label="Magical divider animation"
         preserveAspectRatio="none"
-        class="section-divider__animation">
+        class="section-divider__animation"
+        id="magic-divider">
     </lottie-player>
     <!-- Fallback for browsers without Lottie support -->
     <noscript>

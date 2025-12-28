@@ -201,16 +201,8 @@
             );
         });
 
-        // Hero title typewriter animation
-        const heroTitle = document.querySelector('.hero__title');
-        if (heroTitle) {
-            initTypewriter(heroTitle, {
-                typingSpeed: 80,
-                startDelay: 300,
-                cursorGlowAfter: true,
-                text: 'Drew Bankston'
-            });
-        }
+        // Staggered hero animations
+        initHeroAnimationSequence();
 
         const heroSubtitle = document.querySelector('.hero__subtitle');
         if (heroSubtitle) {
@@ -264,6 +256,102 @@
     }
 
     /**
+     * Hero Animation Sequence Controller
+     * Staggers: 1) Title typewriter, 2) Quill fade-in, 3) Divider animation
+     */
+    function initHeroAnimationSequence() {
+        const heroTitle = document.querySelector('.hero__title');
+        const quillContainer = document.querySelector('.hero__quill-container');
+        const dividerPlayer = document.getElementById('magic-divider');
+        
+        // Track if divider animation has been triggered
+        let dividerAnimationTriggered = false;
+        
+        // Initially hide quill
+        if (quillContainer) {
+            quillContainer.style.opacity = '0';
+            quillContainer.style.transition = 'opacity 0.8s ease-out';
+        }
+        
+        // Calculate when title typing will finish (approx)
+        const titleText = 'Drew Bankston';
+        const typingDuration = 300 + (titleText.length * 80) + 500; // startDelay + chars * speed + buffer
+        
+        // Step 1: Start title typewriter
+        if (heroTitle) {
+            initTypewriter(heroTitle, {
+                typingSpeed: 80,
+                startDelay: 300,
+                cursorGlowAfter: true,
+                text: titleText,
+                onComplete: function() {
+                    // Step 2: Fade in quill after title completes
+                    if (quillContainer) {
+                        setTimeout(function() {
+                            quillContainer.style.opacity = '1';
+                            
+                            // Step 3: Check if divider is in viewport
+                            setTimeout(function() {
+                                checkAndPlayDivider();
+                            }, 800); // Wait for quill fade-in
+                        }, 200); // Small delay after typing
+                    }
+                }
+            });
+        }
+        
+        // Function to play divider animation
+        function playDivider() {
+            if (dividerPlayer && !dividerAnimationTriggered) {
+                dividerAnimationTriggered = true;
+                if (typeof dividerPlayer.play === 'function') {
+                    dividerPlayer.play();
+                }
+            }
+        }
+        
+        // Check if divider is in viewport and play accordingly
+        function checkAndPlayDivider() {
+            if (!dividerPlayer || dividerAnimationTriggered) return;
+            
+            const rect = dividerPlayer.getBoundingClientRect();
+            const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+            
+            if (isInViewport) {
+                // In viewport - play as 3rd in sequence
+                playDivider();
+            } else {
+                // Out of viewport - set up intersection observer
+                setupDividerObserver();
+            }
+        }
+        
+        // Set up intersection observer for divider
+        function setupDividerObserver() {
+            if (!dividerPlayer || dividerAnimationTriggered) return;
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting && !dividerAnimationTriggered) {
+                        playDivider();
+                        observer.disconnect();
+                    }
+                });
+            }, { threshold: 0.3 }); // Trigger when 30% visible
+            
+            observer.observe(dividerPlayer);
+        }
+        
+        // Fallback: If no title, still set up the sequence
+        if (!heroTitle) {
+            if (quillContainer) {
+                quillContainer.style.opacity = '1';
+            }
+            checkAndPlayDivider();
+        }
+    }
+    
+    /**
      * Typewriter effect for text elements
      * @param {HTMLElement} element - The element containing text to animate
      * @param {Object} options - Configuration options
@@ -274,7 +362,8 @@
             startDelay: 500,       // ms before typing starts
             cursorBlinkAfter: true, // keep cursor blinking after typing
             cursorGlowAfter: false, // add glow effect after typing
-            text: null             // optional text override
+            text: null,            // optional text override
+            onComplete: null       // callback when typing finishes
         };
         
         const settings = { ...defaults, ...options };
@@ -323,6 +412,11 @@
                     setTimeout(function() {
                         cursor.classList.add('hidden');
                     }, 1500);
+                }
+                
+                // Call completion callback
+                if (typeof settings.onComplete === 'function') {
+                    settings.onComplete();
                 }
             }
         }
