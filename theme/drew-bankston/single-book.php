@@ -12,7 +12,7 @@ while ( have_posts() ) : the_post();
     $pub_date     = get_post_meta( get_the_ID(), '_dbc_book_pub_date', true );
     $isbn_print   = get_post_meta( get_the_ID(), '_dbc_book_isbn_print', true );
     $audience     = get_post_meta( get_the_ID(), '_dbc_book_audience', true );
-    $formats      = get_post_meta( get_the_ID(), '_dbc_book_formats', true );
+    // $formats field removed - was stored as array causing PHP warnings
     $series_order = get_post_meta( get_the_ID(), '_dbc_book_series_order', true );
     $amazon_url   = get_post_meta( get_the_ID(), '_dbc_book_amazon_url', true );
     $reviews      = get_post_meta( get_the_ID(), '_dbc_book_reviews', true );
@@ -194,20 +194,7 @@ while ( have_posts() ) : the_post();
                     </div>
                     <?php endif; ?>
                     
-                    <?php if ( $formats ) : ?>
-                    <div class="book-details__meta-item">
-                        <dt class="book-details__meta-label">Formats</dt>
-                        <dd class="book-details__meta-value">
-                            <?php 
-                            if ( is_array( $formats ) ) {
-                                echo esc_html( implode( ', ', $formats ) );
-                            } else {
-                                echo esc_html( $formats );
-                            }
-                            ?>
-                        </dd>
-                    </div>
-                    <?php endif; ?>
+                    <?php /* Formats display removed - data stored as array causing errors */ ?>
                 </dl>
             </aside>
         </div>
