@@ -622,7 +622,7 @@ p:last-child {
     left: -10%;
     width: 60%;
     height: 60%;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, rgba(139, 92, 246, 0) 70%);
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, rgba(139, 92, 246, 0) 70%);
 }
 
 .hero__ambient-orb--indigo {
@@ -630,7 +630,7 @@ p:last-child {
     right: -10%;
     width: 50%;
     height: 50%;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, rgba(99, 102, 241, 0) 70%);
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.025) 0%, rgba(99, 102, 241, 0) 70%);
 }
 
 .hero__ambient-orb--cyan {
@@ -638,7 +638,7 @@ p:last-child {
     left: 55%;
     width: 30%;
     height: 30%;
-    background: radial-gradient(circle, rgba(34, 211, 238, 0.03) 0%, rgba(34, 211, 238, 0) 70%);
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.015) 0%, rgba(34, 211, 238, 0) 70%);
 }
 
 /* Violet Glowing Cursor */
