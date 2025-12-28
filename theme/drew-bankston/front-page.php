@@ -130,6 +130,7 @@ get_header();
         autoplay
         mode="normal"
         aria-label="Magical divider animation"
+        preserveAspectRatio="none"
         class="section-divider__animation">
     </lottie-player>
     <!-- Fallback for browsers without Lottie support -->
