@@ -2918,10 +2918,16 @@ lottie-player {
         grid-template-columns: 60px 1fr 1fr;
         gap: var(--space-3);
         padding-right: var(--space-10); /* Make room for remove button */
+        align-items: start; /* Align all items to top */
     }
     
     .cart-item__details {
         grid-column: 2 / -1; /* Span from column 2 to the end */
+        align-self: start; /* Align details at top */
+    }
+    
+    .cart-item__image {
+        align-self: start; /* Align image at top */
     }
     
     .cart-item__quantity {
