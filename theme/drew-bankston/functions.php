@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.2.3' );
+define( 'DBT_VERSION', '3.2.4' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -224,11 +224,23 @@ function dbt_login_styles() {
             color: #fca5a5;
         }
         
+        /* Password field container */
+        .login .wp-pwd {
+            position: relative;
+        }
+        
         /* Password visibility toggle */
         .login .wp-pwd .button.wp-hide-pw {
             background: transparent;
             border: none;
             color: rgba(199, 184, 255, 0.6);
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: auto;
+            padding: 4px 8px;
+            margin: 0;
         }
         
         .login .wp-pwd .button.wp-hide-pw:hover {
@@ -237,6 +249,9 @@ function dbt_login_styles() {
         
         .login .wp-pwd .button.wp-hide-pw .dashicons {
             color: inherit;
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
         }
         
         /* Privacy policy link */
