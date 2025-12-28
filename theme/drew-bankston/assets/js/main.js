@@ -207,7 +207,8 @@
             initTypewriter(heroTitle, {
                 typingSpeed: 80,
                 startDelay: 300,
-                cursorBlinkAfter: true
+                cursorGlowAfter: true,
+                text: 'Drew Bankston'
             });
         }
 
@@ -271,18 +272,34 @@
         const defaults = {
             typingSpeed: 100,      // ms per character
             startDelay: 500,       // ms before typing starts
-            cursorBlinkAfter: true // keep cursor blinking after typing
+            cursorBlinkAfter: true, // keep cursor blinking after typing
+            cursorGlowAfter: false, // add glow effect after typing
+            text: null             // optional text override
         };
         
         const settings = { ...defaults, ...options };
-        const originalText = element.textContent.trim();
         
-        // Set up the element structure
-        element.classList.add('hero__title--typewriter');
-        element.innerHTML = '<span class="typewriter-text"></span><span class="typewriter-cursor typing"></span>';
+        // Check if structure already exists (from PHP template)
+        let textSpan = element.querySelector('.typewriter-text');
+        let cursor = element.querySelector('.typewriter-cursor');
         
-        const textSpan = element.querySelector('.typewriter-text');
-        const cursor = element.querySelector('.typewriter-cursor');
+        // Get the text to type - either from option, existing text span, or element content
+        let originalText = settings.text || 
+                          (textSpan && textSpan.textContent.trim()) || 
+                          element.textContent.trim() || 
+                          'Drew Bankston';
+        
+        // Set up the element structure if not already present
+        if (!textSpan || !cursor) {
+            element.classList.add('hero__title--typewriter');
+            element.innerHTML = '<span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>';
+            textSpan = element.querySelector('.typewriter-text');
+            cursor = element.querySelector('.typewriter-cursor');
+        } else {
+            // Clear existing text for typing effect
+            textSpan.textContent = '';
+            cursor.classList.add('typing');
+        }
         
         let charIndex = 0;
         
@@ -298,7 +315,10 @@
                 // Typing complete
                 cursor.classList.remove('typing');
                 
-                if (!settings.cursorBlinkAfter) {
+                if (settings.cursorGlowAfter) {
+                    // Add violet glow effect
+                    cursor.classList.add('glow');
+                } else if (!settings.cursorBlinkAfter) {
                     // Hide cursor after a short delay
                     setTimeout(function() {
                         cursor.classList.add('hidden');

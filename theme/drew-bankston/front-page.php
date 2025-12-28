@@ -17,33 +17,105 @@ get_header();
 <!-- DEPLOY TEST: v2.1.0 - <?php echo date('Y-m-d H:i:s'); ?> -->
 
 <!-- Hero Section -->
-<section class="hero">
+<section class="hero hero--home">
     <div class="hero__bg"></div>
-    <div class="hero__lottie-bg" aria-hidden="true">
-        <lottie-player 
-            src="<?php echo esc_url( DBT_URL . '/assets/lottie/cosmic-particles.json' ); ?>"
-            background="transparent"
-            speed="0.4"
-            loop="true"
-            autoplay="true">
-        </lottie-player>
+    
+    <!-- Ambient Background Effects -->
+    <div class="hero__ambient" aria-hidden="true">
+        <div class="hero__ambient-orb hero__ambient-orb--violet"></div>
+        <div class="hero__ambient-orb hero__ambient-orb--indigo"></div>
+        <div class="hero__ambient-orb hero__ambient-orb--cyan"></div>
     </div>
     
     <div class="container">
-        <div class="hero__content gsap-reveal">
-            <p class="hero__eyebrow">Colorado Author</p>
-            <h1 class="hero__title">Drew Bankston</h1>
-            <p class="hero__subtitle">Award-winning author crafting immersive worlds where science fiction meets human emotion, and fantasy ignites the imagination.</p>
-            
-            <div class="hero__genres">
-                <span class="hero__genre-tag">Sci-Fi / Space Opera</span>
-                <span class="hero__genre-tag">Fantasy</span>
-                <span class="hero__genre-tag">Non-Fiction / True Crime</span>
+        <div class="hero__grid">
+            <!-- Left Content -->
+            <div class="hero__content">
+                <p class="hero__eyebrow">Colorado Author</p>
+                <h1 class="hero__title hero__title--typewriter">
+                    <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
+                </h1>
+                <p class="hero__subtitle">Award-winning author crafting immersive worlds where science fiction meets human emotion, and fantasy ignites the imagination.</p>
+                
+                <div class="hero__genres">
+                    <span class="hero__genre-tag">Sci-Fi / Space Opera</span>
+                    <span class="hero__genre-tag">Fantasy</span>
+                    <span class="hero__genre-tag">Non-Fiction / True Crime</span>
+                </div>
+                
+                <div class="hero__cta">
+                    <a href="<?php echo esc_url( home_url( '/series/tokorel/' ) ); ?>" class="btn btn--hero-primary">Explore Tokorel Series</a>
+                    <a href="<?php echo esc_url( home_url( '/books/' ) ); ?>" class="btn btn--hero-secondary">View All Books</a>
+                </div>
             </div>
             
-            <div class="hero__cta">
-                <a href="<?php echo esc_url( home_url( '/series/tokorel/' ) ); ?>" class="btn btn--primary btn--lg">Explore Tokorel Series</a>
-                <a href="<?php echo esc_url( home_url( '/books/' ) ); ?>" class="btn btn--secondary btn--lg">View All Books</a>
+            <!-- Right Animation (Magical Quill) -->
+            <div class="hero__quill-container">
+                <!-- Nebula Glow Center -->
+                <div class="hero__nebula-glow"></div>
+                
+                <!-- Rotating Rings -->
+                <div class="hero__ring hero__ring--outer"></div>
+                <div class="hero__ring hero__ring--inner"></div>
+                
+                <!-- Magical Path SVG -->
+                <svg class="hero__magic-path" viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="magicGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8b5cf6; stop-opacity:0"/>
+                            <stop offset="50%" style="stop-color:#a78bfa; stop-opacity:1"/>
+                            <stop offset="100%" style="stop-color:#22d3ee; stop-opacity:0"/>
+                        </linearGradient>
+                        <filter id="pathGlow">
+                            <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <path class="hero__magic-path-line" d="M 120 280 C 120 180, 320 180, 320 280 S 120 380, 120 280" stroke="url(#magicGradient)" stroke-width="2" fill="none" stroke-linecap="round" filter="url(#pathGlow)"/>
+                </svg>
+                
+                <!-- The Quill Object -->
+                <div class="hero__quill">
+                    <svg class="hero__quill-svg" viewBox="0 0 100 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="featherGradient" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%" stop-color="#f8fafc" stop-opacity="0.9"/>
+                                <stop offset="50%" stop-color="#ffffff"/>
+                                <stop offset="100%" stop-color="#e2e8f0" stop-opacity="0.9"/>
+                            </linearGradient>
+                            <linearGradient id="nibGradient" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#cbd5e1"/>
+                                <stop offset="50%" stop-color="#f1f5f9"/>
+                                <stop offset="100%" stop-color="#94a3b8"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Shaft -->
+                        <path d="M50 160 Q 48 80 62 5" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
+                        <!-- Left Vane -->
+                        <path d="M50 150 C 42 145, 38 130, 35 100 C 32 70, 40 40, 58 10 L 62 5" fill="url(#featherGradient)" opacity="0.9"/>
+                        <!-- Right Vane -->
+                        <path d="M50 150 C 58 145, 62 130, 65 100 C 68 70, 60 40, 62 5 L 58 10" fill="url(#featherGradient)" opacity="0.9"/>
+                        <!-- Texture Lines -->
+                        <g stroke="#94a3b8" stroke-width="0.3" stroke-opacity="0.4" fill="none">
+                            <path d="M50 140 Q 40 135 36 120"/><path d="M49 130 Q 38 125 35 110"/>
+                            <path d="M49 120 Q 38 115 34 100"/><path d="M48 110 Q 38 105 34 90"/>
+                            <path d="M48 100 Q 38 95 35 80"/><path d="M49 90 Q 40 85 38 70"/>
+                            <path d="M50 140 Q 60 135 64 120"/><path d="M51 130 Q 62 125 65 110"/>
+                            <path d="M51 120 Q 62 115 66 100"/><path d="M52 110 Q 62 105 66 90"/>
+                            <path d="M52 100 Q 62 95 65 80"/><path d="M51 90 Q 60 85 62 70"/>
+                        </g>
+                        <!-- Nib -->
+                        <path d="M45 160 L 55 160 L 54 180 L 50 195 L 46 180 Z" fill="url(#nibGradient)" stroke="#64748b" stroke-width="0.5"/>
+                        <line x1="50" y1="160" x2="50" y2="185" stroke="#475569" stroke-width="0.5"/>
+                        <!-- Grip -->
+                        <rect x="44" y="158" width="12" height="4" rx="1" fill="#64748b"/>
+                    </svg>
+                    <!-- Tip Light -->
+                    <div class="hero__quill-tip-light"></div>
+                </div>
             </div>
         </div>
     </div>

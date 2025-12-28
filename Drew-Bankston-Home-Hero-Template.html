@@ -1,0 +1,269 @@
+<html lang="en" class="scroll-smooth"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drew Bankston | Sci-Fi &amp; Fantasy Author</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap" rel="stylesheet">
+    <style>
+        /* Custom Animations */
+        @keyframes float-write {
+            0%, 100% { transform: translateY(0) rotate(-15deg) translateX(0); }
+            50% { transform: translateY(-15px) rotate(-10deg) translateX(5px); }
+        }
+
+        @keyframes draw-glow {
+            0% { stroke-dashoffset: 1000; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { stroke-dashoffset: 0; opacity: 0; }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.3)); opacity: 0.5; }
+            50% { filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.6)); opacity: 1; }
+        }
+
+        @keyframes nebula-spin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .quill-float {
+            animation: float-write 6s ease-in-out infinite;
+            transform-origin: bottom center;
+        }
+
+        .path-draw {
+            stroke-dasharray: 1000;
+            animation: draw-glow 4s ease-in-out infinite;
+        }
+
+        .nebula-bg {
+            background: radial-gradient(circle at center, rgba(124, 58, 237, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050810;
+            color: #e2e8f0;
+        }
+
+        h1, h2, h3, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col overflow-x-hidden selection:bg-violet-500/30 selection:text-violet-200">
+
+    <!-- Navigation -->
+    <header class="fixed top-0 w-full z-50 border-b border-slate-800/50 bg-[#050810]/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Brand -->
+            <a href="#" class="flex items-center gap-3 group">
+                <i data-lucide="feather" class="text-violet-400 w-5 h-5 transition-transform group-hover:rotate-12"></i>
+                <span class="font-serif text-lg tracking-tight text-slate-200">Drew Bankston</span>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Home</a>
+                <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Books</a>
+                <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Events</a>
+                <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">About</a>
+                <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
+            </nav>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-6">
+                <button class="text-slate-400 hover:text-white transition-colors">
+                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                </button>
+                <div class="hidden sm:flex items-center gap-4">
+                    <a href="#" class="flex items-center gap-2 text-sm text-slate-400 hover:text-white">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                        Account
+                    </a>
+                    <a href="#" class="bg-slate-100 text-slate-900 px-4 py-2 rounded-full text-xs font-medium hover:bg-white transition-colors">
+                        View All Books
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Hero -->
+    <main class="relative pt-32 pb-24 lg:pt-48 lg:pb-32 overflow-hidden">
+        
+        <!-- Ambient Background Effects -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+            <div class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-violet-900/10 rounded-full blur-[120px]"></div>
+            <div class="absolute bottom-[0%] right-[-5%] w-[40%] h-[40%] bg-indigo-900/10 rounded-full blur-[100px]"></div>
+            <div class="absolute top-[40%] left-[60%] w-[20%] h-[20%] bg-cyan-900/5 rounded-full blur-[80px]"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            
+            <!-- Left Content -->
+            <div class="flex flex-col items-start space-y-8">
+                <div class="space-y-4">
+                    <span class="inline-block text-xs font-medium tracking-[0.2em] uppercase text-violet-400 pl-1">
+                        Colorado Author
+                    </span>
+                    <h1 class="font-serif text-5xl md:text-7xl leading-[1.1] tracking-tight text-white font-normal relative">
+                        Drew Bankston<span class="text-violet-500 animate-pulse">|</span>
+                    </h1>
+                    <p class="text-xl text-slate-400 leading-relaxed font-light max-w-lg">
+                        Award-winning author crafting immersive worlds where science fiction meets human emotion, and fantasy ignites the imagination.
+                    </p>
+                </div>
+
+                <!-- Tags -->
+                <div class="flex flex-wrap gap-3">
+                    <span class="px-3 py-1 rounded-full border border-slate-700/50 bg-slate-800/30 text-xs text-slate-300 backdrop-blur-sm">
+                        Sci-Fi / Space Opera
+                    </span>
+                    <span class="px-3 py-1 rounded-full border border-slate-700/50 bg-slate-800/30 text-xs text-slate-300 backdrop-blur-sm">
+                        Fantasy
+                    </span>
+                    <span class="px-3 py-1 rounded-full border border-slate-700/50 bg-slate-800/30 text-xs text-slate-300 backdrop-blur-sm">
+                        Non-Fiction / True Crime
+                    </span>
+                </div>
+
+                <!-- CTAs -->
+                <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-2">
+                    <a href="#" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-violet-600 text-white text-sm font-medium hover:bg-violet-500 transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)]">
+                        Explore Tokorel Series
+                    </a>
+                    <a href="#" class="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-slate-700 text-slate-300 text-sm font-medium hover:bg-slate-800/50 hover:text-white transition-colors hover:border-slate-500">
+                        View All Books
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Animation (Magical Quill) -->
+            <div class="relative w-full h-[500px] flex items-center justify-center perspective-1000">
+                <!-- Nebula Glow Center -->
+                <div class="absolute inset-0 nebula-bg rounded-full blur-3xl animate-[pulse-glow_4s_ease-in-out_infinite]"></div>
+
+                <!-- Rotating Rings (Sci-Fi element) -->
+                <div class="absolute w-96 h-96 border border-violet-500/10 rounded-full animate-[nebula-spin_20s_linear_infinite]"></div>
+                <div class="absolute w-80 h-80 border border-cyan-500/10 rounded-full animate-[nebula-spin_15s_linear_infinite_reverse]"></div>
+
+                <!-- Magical Path SVG -->
+                <svg class="absolute w-full h-full z-10" viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="magicGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8b5cf6; stop-opacity:0"></stop>
+                            <stop offset="50%" style="stop-color:#a78bfa; stop-opacity:1"></stop>
+                            <stop offset="100%" style="stop-color:#22d3ee; stop-opacity:0"></stop>
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="2.5" result="coloredBlur"></feGaussianBlur>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"></feMergeNode>
+                                <feMergeNode in="SourceGraphic"></feMergeNode>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <!-- The path being "written" -->
+                    <path class="path-draw" d="M 120 280 C 120 180, 320 180, 320 280 S 120 380, 120 280" stroke="url(#magicGradient)" stroke-width="2" fill="none" stroke-linecap="round" filter="url(#glow)"></path>
+                </svg>
+
+                <!-- The Quill Object -->
+                <div class="absolute z-20 quill-float top-1/2 left-1/2 -ml-24 -mt-32 w-48 h-64">
+                     <div class="relative w-full h-full">
+                        <!-- Custom Detailed Feather SVG -->
+                        <div class="text-slate-100 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] opacity-95">
+                             <svg width="100%" height="100%" viewBox="0 0 100 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="featherGradient" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0%" stop-color="#f8fafc" stop-opacity="0.9"></stop>
+                                        <stop offset="50%" stop-color="#ffffff"></stop>
+                                        <stop offset="100%" stop-color="#e2e8f0" stop-opacity="0.9"></stop>
+                                    </linearGradient>
+                                    <linearGradient id="nibGradient" x1="0" y1="0" x2="1" y2="1">
+                                        <stop offset="0%" stop-color="#cbd5e1"></stop>
+                                        <stop offset="50%" stop-color="#f1f5f9"></stop>
+                                        <stop offset="100%" stop-color="#94a3b8"></stop>
+                                    </linearGradient>
+                                </defs>
+
+                                <!-- The Shaft (Rachis) - Tall and Curved -->
+                                <path d="M50 160 Q 48 80 62 5" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"></path>
+
+                                <!-- Main Feather Vanes (Slim and Tall) -->
+                                <!-- Left Vane -->
+                                <path d="M50 150 
+                                         C 42 145, 38 130, 35 100 
+                                         C 32 70, 40 40, 58 10 
+                                         L 62 5" fill="url(#featherGradient)" opacity="0.9"></path>
+                                      
+                                <!-- Right Vane -->
+                                <path d="M50 150 
+                                         C 58 145, 62 130, 65 100 
+                                         C 68 70, 60 40, 62 5 
+                                         L 58 10" fill="url(#featherGradient)" opacity="0.9"></path>
+
+                                <!-- Texture Lines (Fine details extending up) -->
+                                <g stroke="#94a3b8" stroke-width="0.3" stroke-opacity="0.4" fill="none">
+                                    <!-- Left Texture -->
+                                    <path d="M50 140 Q 40 135 36 120"></path>
+                                    <path d="M49 130 Q 38 125 35 110"></path>
+                                    <path d="M49 120 Q 38 115 34 100"></path>
+                                    <path d="M48 110 Q 38 105 34 90"></path>
+                                    <path d="M48 100 Q 38 95 35 80"></path>
+                                    <path d="M49 90 Q 40 85 38 70"></path>
+                                    <path d="M50 80 Q 42 75 42 60"></path>
+                                    <path d="M52 70 Q 45 65 46 50"></path>
+                                    <path d="M54 60 Q 48 55 50 40"></path>
+                                    <path d="M56 50 Q 52 45 54 30"></path>
+                                    
+                                    <!-- Right Texture -->
+                                    <path d="M50 140 Q 60 135 64 120"></path>
+                                    <path d="M51 130 Q 62 125 65 110"></path>
+                                    <path d="M51 120 Q 62 115 66 100"></path>
+                                    <path d="M52 110 Q 62 105 66 90"></path>
+                                    <path d="M52 100 Q 62 95 65 80"></path>
+                                    <path d="M51 90 Q 60 85 62 70"></path>
+                                    <path d="M50 80 Q 58 75 58 60"></path>
+                                    <path d="M49 70 Q 55 65 54 50"></path>
+                                    <path d="M48 60 Q 52 55 50 40"></path>
+                                    <path d="M47 50 Q 49 45 48 30"></path>
+                                </g>
+
+                                <!-- The Nib (Writing Tip) -->
+                                <path d="M45 160 L 55 160 L 54 180 L 50 195 L 46 180 Z" fill="url(#nibGradient)" stroke="#64748b" stroke-width="0.5"></path>
+                                <line x1="50" y1="160" x2="50" y2="185" stroke="#475569" stroke-width="0.5"></line>
+                                
+                                <!-- Grip -->
+                                <rect x="44" y="158" width="12" height="4" rx="1" fill="#64748b"></rect>
+                             </svg>
+                        </div>
+                        
+                        <!-- Sci-fi "Tip" Light -->
+                        <div class="absolute bottom-[4px] left-1/2 w-1.5 h-1.5 bg-cyan-200 rounded-full shadow-[0_0_15px_#22d3ee,0_0_30px_#8b5cf6] -translate-x-1/2"></div>
+                     </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Decorative Divider -->
+        <div class="absolute bottom-0 w-full flex justify-center items-center opacity-30">
+            <div class="h-[1px] w-full max-w-sm bg-gradient-to-r from-transparent via-slate-600 to-transparent"></div>
+            <div class="w-1.5 h-1.5 rounded-full bg-slate-400 mx-2"></div>
+            <div class="h-[1px] w-full max-w-sm bg-gradient-to-r from-transparent via-slate-600 to-transparent"></div>
+        </div>
+
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body></html>
