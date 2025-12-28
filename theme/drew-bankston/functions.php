@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.2.4' );
+define( 'DBT_VERSION', '3.2.5' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
 
@@ -224,23 +224,37 @@ function dbt_login_styles() {
             color: #fca5a5;
         }
         
-        /* Password field container */
+        /* Password field container - use flex to properly align */
         .login .wp-pwd {
             position: relative;
+            display: flex;
+            align-items: flex-start;
         }
         
-        /* Password visibility toggle */
+        /* Password input - fill available space */
+        .login .wp-pwd input[type="password"],
+        .login .wp-pwd input[type="text"] {
+            flex: 1;
+            padding-right: 45px !important;
+        }
+        
+        /* Password visibility toggle - center vertically with input */
         .login .wp-pwd .button.wp-hide-pw {
             background: transparent;
             border: none;
             color: rgba(199, 184, 255, 0.6);
             position: absolute;
             right: 8px;
-            top: 50%;
+            /* Account for input margin-top (8px) and center within input height */
+            top: calc(8px + 24px);
             transform: translateY(-50%);
-            height: auto;
-            padding: 4px 8px;
+            height: 24px;
+            width: 24px;
+            padding: 0;
             margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .login .wp-pwd .button.wp-hide-pw:hover {
@@ -252,6 +266,7 @@ function dbt_login_styles() {
             width: 20px;
             height: 20px;
             font-size: 20px;
+            line-height: 1;
         }
         
         /* Privacy policy link */
