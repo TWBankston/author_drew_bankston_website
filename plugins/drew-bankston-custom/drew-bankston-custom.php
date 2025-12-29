@@ -92,6 +92,13 @@ function dbc_populate_purchase_data() {
         'the-monsters-lap' => array(
             'amazon_url'     => 'https://www.amazon.com/Monsters-Lap-Mr-Drew-Bankston/dp/0988696657',
         ),
+        'sounds-of-tomorrow' => array(
+            'amazon_url'     => 'https://www.amazon.com/Sounds-Tomorrow-Drew-Bankston/dp/0997554770/ref=cm_cr_arp_d_product_top?ie=UTF8',
+            'signed_enabled' => '1',
+            'signed_price'   => '10.95',
+            'digital_enabled' => '1',
+            'digital_price'  => '4.99',
+        ),
     );
     
     $output = '<h2>Populating Book Purchase Data</h2><ul>';
