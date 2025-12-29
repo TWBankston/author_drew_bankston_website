@@ -569,6 +569,16 @@ p:last-child {
     background: rgba(185, 215, 255, 0.1);
     border: 1px solid rgba(185, 215, 255, 0.2);
     border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.hero__genre-tag:hover {
+    background: rgba(185, 215, 255, 0.2);
+    border-color: rgba(185, 215, 255, 0.4);
+    color: #fff;
+    transform: translateY(-1px);
 }
 
 .hero__cta {

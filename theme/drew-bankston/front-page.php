@@ -38,9 +38,9 @@ get_header();
                 <p class="hero__subtitle">Award-winning author crafting immersive worlds where science fiction meets human emotion, and fantasy ignites the imagination.</p>
                 
                 <div class="hero__genres">
-                    <span class="hero__genre-tag">Sci-Fi / Space Opera</span>
-                    <span class="hero__genre-tag">Fantasy</span>
-                    <span class="hero__genre-tag">Non-Fiction / True Crime</span>
+                    <a href="<?php echo esc_url( home_url( '/books/?filter=genre-sci-fi-space-opera' ) ); ?>" class="hero__genre-tag">Sci-Fi / Space Opera</a>
+                    <a href="<?php echo esc_url( home_url( '/books/?filter=genre-contemporary-fantasy' ) ); ?>" class="hero__genre-tag">Fantasy</a>
+                    <a href="<?php echo esc_url( home_url( '/books/?filter=genre-non-fiction' ) ); ?>" class="hero__genre-tag">Non-Fiction / True Crime</a>
                 </div>
                 
                 <div class="hero__cta">

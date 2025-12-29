@@ -119,36 +119,66 @@
         const bookCards = document.querySelectorAll('.book-card[data-categories]');
 
         if (!filterBtns.length || !bookCards.length) return;
+        
+        // Function to apply a filter
+        function applyFilter(filter) {
+            // Update active state
+            filterBtns.forEach(function(b) { 
+                b.classList.remove('active');
+                if (b.dataset.filter === filter) {
+                    b.classList.add('active');
+                }
+            });
+            
+            // Filter books
+            bookCards.forEach(function(card) {
+                if (filter === 'all') {
+                    card.style.display = '';
+                } else {
+                    const categories = card.dataset.categories || '';
+                    if (categories.includes(filter)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Animate visible cards
+            if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+                gsap.fromTo('.book-card:not([style*="display: none"])',
+                    { opacity: 0, y: 20 },
+                    { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out' }
+                );
+            }
+        }
+        
+        // Check for URL parameter on page load
+        const urlParams = new URLSearchParams(window.location.search);
+        const filterParam = urlParams.get('filter');
+        if (filterParam) {
+            // Find if there's a matching filter button
+            const matchingBtn = Array.from(filterBtns).find(function(btn) {
+                return btn.dataset.filter === filterParam;
+            });
+            if (matchingBtn) {
+                applyFilter(filterParam);
+            }
+        }
 
         filterBtns.forEach(function(btn) {
             btn.addEventListener('click', function() {
                 const filter = this.dataset.filter;
+                applyFilter(filter);
                 
-                // Update active state
-                filterBtns.forEach(function(b) { b.classList.remove('active'); });
-                this.classList.add('active');
-                
-                // Filter books
-                bookCards.forEach(function(card) {
-                    if (filter === 'all') {
-                        card.style.display = '';
-                    } else {
-                        const categories = card.dataset.categories || '';
-                        if (categories.includes(filter)) {
-                            card.style.display = '';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    }
-                });
-                
-                // Animate visible cards
-                if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
-                    gsap.fromTo('.book-card:not([style*="display: none"])',
-                        { opacity: 0, y: 20 },
-                        { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out' }
-                    );
+                // Update URL without reload
+                const url = new URL(window.location);
+                if (filter === 'all') {
+                    url.searchParams.delete('filter');
+                } else {
+                    url.searchParams.set('filter', filter);
                 }
+                window.history.replaceState({}, '', url);
             });
         });
     }
