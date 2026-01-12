@@ -1,8 +1,11 @@
 # Dependencies
 node_modules/
 
-# Deployment config (contains credentials)
+# Server credentials and connection info (NEVER commit these!)
+HOSTINGER-SERVER-INFO.md
+connection info/
 deploy.config.js
+*.config.js
 
 # Environment files
 .env

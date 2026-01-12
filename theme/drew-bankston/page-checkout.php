@@ -255,6 +255,10 @@ foreach ( $cart as $item ) {
                 <div class="checkout-block">
                     <h2 class="checkout-block__title">Payment</h2>
                     
+                    <?php 
+                    $square_config = dbt_get_square_config();
+                    if ( ! $square_config['enabled'] ) : 
+                    ?>
                     <div class="payment-placeholder">
                         <div class="payment-placeholder__icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -263,15 +267,17 @@ foreach ( $cart as $item ) {
                             </svg>
                         </div>
                         <p class="payment-placeholder__text">
-                            <strong>Payment processing coming soon!</strong><br>
-                            Square payment integration will be available here.
+                            <strong>Payment processing is not configured.</strong><br>
+                            Please contact the site administrator.
                         </p>
                     </div>
-                    
-                    <!-- This is where Square Web Payments SDK will be integrated -->
-                    <div id="square-payment-form" style="display: none;">
-                        <!-- Card input will be injected here -->
+                    <?php else : ?>
+                    <!-- Square Web Payments SDK -->
+                    <div id="square-payment-form">
+                        <div id="card-container"></div>
+                        <div id="payment-status-container" style="display: none; margin-top: 1rem;"></div>
                     </div>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Mobile Order Review (Bottom) - Only visible on mobile/tablet -->
@@ -329,10 +335,12 @@ foreach ( $cart as $item ) {
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn btn--primary btn--lg btn--full" disabled>
+                    <button type="submit" class="btn btn--primary btn--lg btn--full" id="checkout-submit-btn-mobile">
                         Complete Order — $<?php echo esc_html( number_format( $total, 2 ) ); ?>
                     </button>
-                    <p class="checkout-review__note">Payment integration coming soon</p>
+                    <?php if ( ! $square_config['enabled'] ) : ?>
+                    <p class="checkout-review__note">Payment processing not configured</p>
+                    <?php endif; ?>
                 </div>
                 
             </div>
@@ -381,10 +389,12 @@ foreach ( $cart as $item ) {
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn--primary btn--lg btn--full" disabled>
-                    Complete Order
+                <button type="submit" class="btn btn--primary btn--lg btn--full" id="checkout-submit-btn">
+                    Complete Order — $<?php echo esc_html( number_format( $total, 2 ) ); ?>
                 </button>
-                <p class="checkout-summary__note">Payment integration coming soon</p>
+                <?php if ( ! $square_config['enabled'] ) : ?>
+                <p class="checkout-summary__note">Payment processing not configured</p>
+                <?php endif; ?>
                 
                 <a href="<?php echo esc_url( home_url( '/cart/' ) ); ?>" class="checkout-summary__back">
                     ← Return to Cart
@@ -499,6 +509,134 @@ document.querySelectorAll('#checkout-form input, #checkout-form select').forEach
 
 // Initial update
 updateReviewSection();
+
+<?php if ( $square_config['enabled'] ) : ?>
+// Square Web Payments SDK Integration
+(async function() {
+    const appId = '<?php echo esc_js( $square_config['application_id'] ); ?>';
+    const locationId = '<?php echo esc_js( $square_config['location_id'] ); ?>';
+    
+    if (!appId || !locationId) {
+        console.error('Square configuration missing');
+        return;
+    }
+
+    // Load Square Web Payments SDK
+    const script = document.createElement('script');
+    script.src = '<?php echo $square_config['sandbox'] ? 'https://sandbox.web.squarecdn.com/v1/square.js' : 'https://web.squarecdn.com/v1/square.js'; ?>';
+    script.async = true;
+    
+    script.onload = async function() {
+        try {
+            const payments = window.Square.payments(appId, locationId);
+            const card = await payments.card();
+            await card.attach('#card-container');
+            
+            // Handle form submission
+            const form = document.getElementById('checkout-form');
+            const submitBtn = document.getElementById('checkout-submit-btn');
+            const submitBtnMobile = document.getElementById('checkout-submit-btn-mobile');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Disable submit buttons
+                submitBtn.disabled = true;
+                submitBtnMobile.disabled = true;
+                submitBtn.textContent = 'Processing...';
+                submitBtnMobile.textContent = 'Processing...';
+                
+                try {
+                    // Tokenize card
+                    const result = await card.tokenize();
+                    
+                    if (result.status === 'OK') {
+                        // Collect form data
+                        const formData = new FormData(form);
+                        const customerData = {
+                            first_name: formData.get('first_name'),
+                            last_name: formData.get('last_name'),
+                            email: formData.get('email'),
+                            phone: formData.get('phone'),
+                            address_1: formData.get('address_1'),
+                            address_2: formData.get('address_2'),
+                            city: formData.get('city'),
+                            state: formData.get('state'),
+                            zip: formData.get('zip'),
+                            country: formData.get('country'),
+                            signature_request: formData.get('signature_request'),
+                            signature_message: formData.get('signature_message'),
+                            create_account: formData.get('create_account'),
+                            account_password: formData.get('account_password'),
+                        };
+                        
+                        // Send payment to server
+                        const response = await fetch('<?php echo admin_url( 'admin-ajax.php' ); ?>', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                action: 'dbc_process_payment',
+                                nonce: '<?php echo wp_create_nonce( 'dbc-checkout-nonce' ); ?>',
+                                source_id: result.token,
+                                amount: <?php echo $total; ?>,
+                                customer: JSON.stringify(customerData),
+                                cart_items: JSON.stringify(<?php echo wp_json_encode( array_values( $cart ) ); ?>),
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Redirect to order confirmation
+                            window.location.href = data.data.redirect;
+                        } else {
+                            // Show error
+                            alert('Payment failed: ' + (data.data.message || 'Unknown error'));
+                            submitBtn.disabled = false;
+                            submitBtnMobile.disabled = false;
+                            submitBtn.textContent = 'Complete Order — $<?php echo number_format( $total, 2 ); ?>';
+                            submitBtnMobile.textContent = 'Complete Order — $<?php echo number_format( $total, 2 ); ?>';
+                        }
+                    } else {
+                        // Tokenization error
+                        let errorMessage = 'Payment failed. Please check your card details.';
+                        if (result.errors) {
+                            errorMessage = result.errors.map(e => e.message).join(', ');
+                        }
+                        alert(errorMessage);
+                        submitBtn.disabled = false;
+                        submitBtnMobile.disabled = false;
+                        submitBtn.textContent = 'Complete Order — $<?php echo number_format( $total, 2 ); ?>';
+                        submitBtnMobile.textContent = 'Complete Order — $<?php echo number_format( $total, 2 ); ?>';
+                    }
+                } catch (error) {
+                    console.error('Payment error:', error);
+                    alert('Payment failed: ' + error.message);
+                    submitBtn.disabled = false;
+                    submitBtnMobile.disabled = false;
+                    submitBtn.textContent = 'Complete Order — $<?php echo number_format( $total, 2 ); ?>';
+                    submitBtnMobile.textContent = 'Complete Order — $<?php echo number_format( $total, 2 ); ?>';
+                }
+            });
+            
+        } catch (error) {
+            console.error('Square initialization error:', error);
+            document.getElementById('payment-status-container').innerHTML = '<p style="color: red;">Payment system initialization failed. Please refresh the page.</p>';
+            document.getElementById('payment-status-container').style.display = 'block';
+        }
+    };
+    
+    script.onerror = function() {
+        console.error('Failed to load Square SDK');
+        document.getElementById('payment-status-container').innerHTML = '<p style="color: red;">Failed to load payment system. Please refresh the page.</p>';
+        document.getElementById('payment-status-container').style.display = 'block';
+    };
+    
+    document.head.appendChild(script);
+})();
+<?php endif; ?>
 </script>
 
 <?php get_footer(); ?>

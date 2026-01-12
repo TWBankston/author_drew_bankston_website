@@ -1,89 +1,144 @@
 <?php
 /**
  * Template Name: Order Confirmation
- * Displays order confirmation after successful purchase
+ * Order confirmation page after successful payment
  */
 
 get_header();
 
-// In production, this would retrieve order details from the database
-$order_id = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : '';
+// Get order ID from URL
+$order_id = isset( $_GET['order'] ) ? intval( $_GET['order'] ) : 0;
+
+if ( ! $order_id ) {
+    wp_redirect( home_url( '/cart/' ) );
+    exit;
+}
+
+// Get order from database
+global $wpdb;
+$table_name = $wpdb->prefix . 'dbc_orders';
+$order = $wpdb->get_row( $wpdb->prepare( 
+    "SELECT * FROM $table_name WHERE id = %d", 
+    $order_id 
+) );
+
+if ( ! $order ) {
+    wp_redirect( home_url( '/cart/' ) );
+    exit;
+}
+
+$order_items = json_decode( $order->order_items, true );
+$shipping_address = json_decode( $order->shipping_address, true );
 ?>
 
-<!-- Confirmation Hero -->
+<!-- Order Confirmation Hero -->
 <section class="hero hero--compact">
     <div class="container">
         <div class="hero__content hero__content--centered">
-            <div class="confirmation-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-accent-sky); margin: 0 auto;">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                     <polyline points="22 4 12 14.01 9 11.01"/>
                 </svg>
             </div>
-            <h1 class="hero__title hero__title--typewriter" data-typewriter-text="Thank You!">
-                <span class="typewriter-text"></span><span class="typewriter-cursor typing">|</span>
-            </h1>
-            <p class="hero__subtitle">Your order has been placed successfully</p>
+            <h1 class="hero__title">Order Confirmed!</h1>
+            <p class="hero__subtitle">Thank you for your purchase, <?php echo esc_html( explode( ' ', $order->customer_name )[0] ); ?>!</p>
         </div>
     </div>
 </section>
 
-<!-- Confirmation Content -->
-<section class="section confirmation-section">
-    <div class="container container--narrow">
-        <div class="confirmation-card">
-            <div class="confirmation-card__header">
-                <h2>Order Confirmed</h2>
-                <?php if ( $order_id ) : ?>
-                <p class="confirmation-card__order-id">Order #<?php echo esc_html( $order_id ); ?></p>
-                <?php endif; ?>
-            </div>
+<!-- Order Details -->
+<section class="section">
+    <div class="container" style="max-width: 800px;">
+        
+        <!-- Order Summary -->
+        <div class="checkout-block" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--radius-lg); padding: var(--space-8); margin-bottom: var(--space-6);">
+            <h2 class="checkout-block__title">Order #<?php echo esc_html( $order_id ); ?></h2>
             
-            <div class="confirmation-card__body">
-                <p>We've received your order and are preparing it for shipment. You'll receive a confirmation email shortly with your order details and tracking information.</p>
-                
-                <div class="confirmation-card__next-steps">
-                    <h3>What's Next?</h3>
-                    <ul>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                <polyline points="22,6 12,13 2,6"/>
-                            </svg>
-                            <span>Check your email for order confirmation</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="1" y="3" width="15" height="13"/>
-                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
-                                <circle cx="5.5" cy="18.5" r="2.5"/>
-                                <circle cx="18.5" cy="18.5" r="2.5"/>
-                            </svg>
-                            <span>Signed books ship within 3-5 business days</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                            <span>Digital purchases are available immediately in your account</span>
-                        </li>
-                    </ul>
+            <div style="display: grid; gap: var(--space-4); margin-bottom: var(--space-6);">
+                <div style="display: flex; justify-content: space-between; padding-bottom: var(--space-4); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                    <span style="color: rgba(255, 255, 255, 0.7);">Order Date</span>
+                    <span><?php echo esc_html( date( 'F j, Y', strtotime( $order->created_at ) ) ); ?></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-bottom: var(--space-4); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                    <span style="color: rgba(255, 255, 255, 0.7);">Status</span>
+                    <span style="color: var(--color-accent-sky);"><?php echo esc_html( ucfirst( $order->status ) ); ?></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-bottom: var(--space-4); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                    <span style="color: rgba(255, 255, 255, 0.7);">Total</span>
+                    <span style="font-size: var(--text-xl); font-weight: var(--font-bold); color: var(--color-accent-sky);">$<?php echo esc_html( number_format( $order->total_amount, 2 ) ); ?></span>
                 </div>
             </div>
             
-            <div class="confirmation-card__actions">
-                <a href="<?php echo esc_url( home_url( '/account/' ) ); ?>" class="btn btn--primary">View My Account</a>
-                <a href="<?php echo esc_url( home_url( '/books/' ) ); ?>" class="btn btn--secondary">Continue Shopping</a>
+            <p style="color: rgba(255, 255, 255, 0.7); font-size: var(--text-sm);">
+                A confirmation email has been sent to <strong><?php echo esc_html( $order->customer_email ); ?></strong>
+            </p>
+        </div>
+        
+        <!-- Order Items -->
+        <div class="checkout-block" style="margin-bottom: var(--space-6);">
+            <h3 style="margin-bottom: var(--space-4);">Items Ordered</h3>
+            
+            <div style="display: grid; gap: var(--space-4);">
+                <?php foreach ( $order_items as $item ) : ?>
+                <div style="display: flex; gap: var(--space-4); padding: var(--space-4); background: rgba(255, 255, 255, 0.03); border-radius: var(--radius-md);">
+                    <?php if ( ! empty( $item['thumbnail'] ) ) : ?>
+                    <img src="<?php echo esc_url( $item['thumbnail'] ); ?>" alt="<?php echo esc_attr( $item['name'] ); ?>" style="width: 60px; height: 90px; object-fit: contain; border-radius: var(--radius-md);">
+                    <?php endif; ?>
+                    <div style="flex: 1;">
+                        <h4 style="margin-bottom: var(--space-1);"><?php echo esc_html( $item['name'] ); ?></h4>
+                        <p style="color: rgba(255, 255, 255, 0.7); font-size: var(--text-sm);">
+                            Quantity: <?php echo esc_html( $item['quantity'] ); ?>
+                        </p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="font-weight: var(--font-bold);">$<?php echo esc_html( number_format( $item['price'] * $item['quantity'], 2 ) ); ?></p>
+                    </div>
+                </div>
+                <?php endforeach; ?>
             </div>
         </div>
+        
+        <!-- Shipping Address -->
+        <?php if ( ! empty( $shipping_address['address_1'] ) ) : ?>
+        <div class="checkout-block" style="margin-bottom: var(--space-6);">
+            <h3 style="margin-bottom: var(--space-4);">Shipping Address</h3>
+            <div style="padding: var(--space-4); background: rgba(255, 255, 255, 0.03); border-radius: var(--radius-md);">
+                <p><?php echo esc_html( $order->customer_name ); ?></p>
+                <p><?php echo esc_html( $shipping_address['address_1'] ); ?></p>
+                <?php if ( ! empty( $shipping_address['address_2'] ) ) : ?>
+                <p><?php echo esc_html( $shipping_address['address_2'] ); ?></p>
+                <?php endif; ?>
+                <p><?php echo esc_html( $shipping_address['city'] . ', ' . $shipping_address['state'] . ' ' . $shipping_address['zip'] ); ?></p>
+                <?php if ( $shipping_address['country'] === 'CA' ) : ?>
+                <p>Canada</p>
+                <?php endif; ?>
+            </div>
+            
+            <?php if ( $order->signature_request ) : ?>
+            <div style="margin-top: var(--space-4); padding: var(--space-4); background: rgba(185, 215, 255, 0.1); border: 1px solid rgba(185, 215, 255, 0.2); border-radius: var(--radius-md);">
+                <p style="font-weight: var(--font-medium); margin-bottom: var(--space-2);">✍️ Signature Requested</p>
+                <?php if ( ! empty( $order->signature_message ) ) : ?>
+                <p style="color: rgba(255, 255, 255, 0.7); font-size: var(--text-sm); font-style: italic;">"<?php echo esc_html( $order->signature_message ); ?>"</p>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Actions -->
+        <div style="display: flex; gap: var(--space-4); justify-content: center; margin-top: var(--space-8);">
+            <?php if ( is_user_logged_in() ) : ?>
+            <a href="<?php echo esc_url( home_url( '/account/?section=orders' ) ); ?>" class="btn btn--secondary">
+                View All Orders
+            </a>
+            <?php endif; ?>
+            <a href="<?php echo esc_url( home_url( '/books/' ) ); ?>" class="btn btn--primary">
+                Continue Shopping
+            </a>
+        </div>
+        
     </div>
 </section>
 
-<?php 
-// Clear the cart after successful order
-DBC_Cart::clear_cart();
-
-get_footer(); 
-?>
+<?php get_footer(); ?>

@@ -265,34 +265,77 @@ if ( isset( $_POST['dbc_change_password'] ) && wp_verify_nonce( $_POST['dbc_pass
 
                     <!-- Purchases Tab -->
                     <div class="account-panel" id="purchases">
-                        <h2 class="account-panel__title">Purchase History</h2>
-                        <p class="account-panel__description">View your book purchases and order history.</p>
+                        <h2 class="account-panel__title">Order History</h2>
+                        <p class="account-panel__description">View your complete order history and purchase details.</p>
                         
-                        <?php if ( ! empty( $purchased_books ) ) : ?>
-                        <div class="account-purchases">
-                            <?php foreach ( $purchased_books as $purchase ) : 
-                                $book = get_post( $purchase['book_id'] );
-                                if ( ! $book ) continue;
-                                $cover_id = get_post_thumbnail_id( $book->ID );
-                                $cover_url = $cover_id ? wp_get_attachment_image_url( $cover_id, 'medium' ) : '';
+                        <?php
+                        // Get orders for this user
+                        global $wpdb;
+                        $table_name = $wpdb->prefix . 'dbc_orders';
+                        $orders = $wpdb->get_results( $wpdb->prepare(
+                            "SELECT * FROM $table_name WHERE user_id = %d OR customer_email = %s ORDER BY created_at DESC",
+                            $user_id,
+                            $current_user->user_email
+                        ) );
+                        
+                        if ( ! empty( $orders ) ) : ?>
+                        <div class="account-orders">
+                            <?php foreach ( $orders as $order ) : 
+                                $order_items = json_decode( $order->order_items, true );
+                                $shipping_address = json_decode( $order->shipping_address, true );
                             ?>
-                            <div class="account-purchase-item">
-                                <?php if ( $cover_url ) : ?>
-                                    <img src="<?php echo esc_url( $cover_url ); ?>" alt="<?php echo esc_attr( $book->post_title ); ?>" class="account-purchase-item__cover">
-                                <?php endif; ?>
-                                <div class="account-purchase-item__info">
-                                    <h3><?php echo esc_html( $book->post_title ); ?></h3>
-                                    <p>Purchased: <?php echo esc_html( date( 'F j, Y', strtotime( $purchase['date'] ) ) ); ?></p>
-                                    <p class="account-purchase-item__format"><?php echo esc_html( $purchase['format'] ?? 'eBook' ); ?></p>
+                            <div class="account-order-card">
+                                <div class="account-order-card__header">
+                                    <div>
+                                        <h3 class="account-order-card__number">Order #<?php echo esc_html( $order->id ); ?></h3>
+                                        <p class="account-order-card__date"><?php echo esc_html( date( 'F j, Y', strtotime( $order->created_at ) ) ); ?></p>
+                                    </div>
+                                    <div class="account-order-card__status">
+                                        <span class="status-badge status-badge--<?php echo esc_attr( strtolower( $order->status ) ); ?>">
+                                            <?php echo esc_html( ucfirst( $order->status ) ); ?>
+                                        </span>
+                                        <p class="account-order-card__total">$<?php echo esc_html( number_format( $order->total_amount, 2 ) ); ?></p>
+                                    </div>
                                 </div>
-                                <span class="account-purchase-item__price">$<?php echo esc_html( number_format( $purchase['amount'] ?? 0, 2 ) ); ?></span>
+                                
+                                <div class="account-order-card__items">
+                                    <?php foreach ( $order_items as $item ) : ?>
+                                    <div class="account-order-item">
+                                        <?php if ( ! empty( $item['thumbnail'] ) ) : ?>
+                                        <img src="<?php echo esc_url( $item['thumbnail'] ); ?>" alt="<?php echo esc_attr( $item['name'] ); ?>" class="account-order-item__thumb">
+                                        <?php endif; ?>
+                                        <div class="account-order-item__info">
+                                            <p class="account-order-item__name"><?php echo esc_html( $item['name'] ); ?></p>
+                                            <p class="account-order-item__qty">Qty: <?php echo esc_html( $item['quantity'] ); ?></p>
+                                        </div>
+                                        <p class="account-order-item__price">$<?php echo esc_html( number_format( $item['price'] * $item['quantity'], 2 ) ); ?></p>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                
+                                <?php if ( ! empty( $shipping_address['address_1'] ) ) : ?>
+                                <div class="account-order-card__shipping">
+                                    <h4>Shipping Address</h4>
+                                    <p>
+                                        <?php echo esc_html( $shipping_address['address_1'] ); ?><br>
+                                        <?php if ( ! empty( $shipping_address['address_2'] ) ) : ?>
+                                        <?php echo esc_html( $shipping_address['address_2'] ); ?><br>
+                                        <?php endif; ?>
+                                        <?php echo esc_html( $shipping_address['city'] . ', ' . $shipping_address['state'] . ' ' . $shipping_address['zip'] ); ?>
+                                    </p>
+                                </div>
+                                <?php endif; ?>
+                                
+                                <div class="account-order-card__footer">
+                                    <a href="<?php echo esc_url( home_url( '/order-confirmation/?order=' . $order->id ) ); ?>" class="btn btn--secondary btn--sm">View Details</a>
+                                </div>
                             </div>
                             <?php endforeach; ?>
                         </div>
                         <?php else : ?>
                         <div class="account-empty">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                            <p>No purchases yet.</p>
+                            <p>No orders yet.</p>
                             <a href="<?php echo esc_url( home_url( '/books/' ) ); ?>" class="btn btn--primary">Shop Books</a>
                         </div>
                         <?php endif; ?>

@@ -882,20 +882,26 @@ function dbt_get_social_icon( $platform ) {
 }
 
 /**
- * Square eCommerce - Configuration holder (not connected yet)
- * Credentials to be added later:
+ * Square eCommerce - Configuration holder
+ * Get Square configuration securely
  * - Square Application ID
  * - Access Token
  * - Location ID
  * - Webhook endpoint
  */
 function dbt_get_square_config() {
+    $app_id = get_option( 'dbt_square_app_id', '' );
+    $access_token = get_option( 'dbt_square_access_token', '' );
+    $location_id = get_option( 'dbt_square_location_id', '' );
+    
+    $is_configured = ! empty( $app_id ) && ! empty( $access_token ) && ! empty( $location_id );
+    
     return array(
-        'enabled'        => false,
-        'sandbox'        => true,
-        'application_id' => get_option( 'dbt_square_app_id', '' ),
-        'access_token'   => get_option( 'dbt_square_access_token', '' ),
-        'location_id'    => get_option( 'dbt_square_location_id', '' ),
+        'enabled'        => $is_configured,
+        'sandbox'        => get_option( 'dbt_square_sandbox', '1' ) === '1',
+        'application_id' => $app_id,
+        'access_token'   => $access_token,
+        'location_id'    => $location_id,
         'webhook_url'    => home_url( '/square-webhook/' ),
     );
 }
@@ -923,45 +929,77 @@ function dbt_square_settings_page() {
         update_option( 'dbt_square_app_id', sanitize_text_field( $_POST['dbt_square_app_id'] ?? '' ) );
         update_option( 'dbt_square_access_token', sanitize_text_field( $_POST['dbt_square_access_token'] ?? '' ) );
         update_option( 'dbt_square_location_id', sanitize_text_field( $_POST['dbt_square_location_id'] ?? '' ) );
+        update_option( 'dbt_square_sandbox', isset( $_POST['dbt_square_sandbox'] ) ? '1' : '0' );
         echo '<div class="notice notice-success"><p>Settings saved.</p></div>';
     }
     
     $config = dbt_get_square_config();
+    $is_configured = $config['enabled'];
     ?>
     <div class="wrap">
         <h1>Square Integration Settings</h1>
-        <p class="description">Configure Square payment processing. <strong>Not yet connected</strong> - add credentials below when ready.</p>
         
-        <form method="post">
+        <?php if ( $is_configured ) : ?>
+            <div class="notice notice-success">
+                <p><strong>✓ Square is configured and ready!</strong></p>
+            </div>
+        <?php else : ?>
+            <div class="notice notice-warning">
+                <p><strong>⚠ Square is not yet configured.</strong> Add credentials below to enable payment processing.</p>
+            </div>
+        <?php endif; ?>
+        
+        <form method="post" style="max-width: 800px;">
             <?php wp_nonce_field( 'dbt_square_settings' ); ?>
             
             <table class="form-table">
                 <tr>
+                    <th colspan="2"><h2>Environment</h2></th>
+                </tr>
+                <tr>
+                    <th><label for="dbt_square_sandbox">Sandbox Mode</label></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" id="dbt_square_sandbox" name="dbt_square_sandbox" value="1" <?php checked( $config['sandbox'], true ); ?>>
+                            Enable Sandbox/Test Mode
+                        </label>
+                        <p class="description">Use sandbox credentials for testing. Uncheck to use production credentials for real payments.</p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th colspan="2"><h2>API Credentials</h2></th>
+                </tr>
+                <tr>
                     <th><label for="dbt_square_app_id">Application ID</label></th>
                     <td>
-                        <input type="text" id="dbt_square_app_id" name="dbt_square_app_id" value="<?php echo esc_attr( $config['application_id'] ); ?>" class="regular-text">
-                        <p class="description">From Square Developer Dashboard</p>
+                        <input type="text" id="dbt_square_app_id" name="dbt_square_app_id" value="<?php echo esc_attr( $config['application_id'] ); ?>" class="regular-text" style="width: 400px;">
+                        <p class="description">From Square Developer Dashboard (sandbox or production)</p>
                     </td>
                 </tr>
                 <tr>
                     <th><label for="dbt_square_access_token">Access Token</label></th>
                     <td>
-                        <input type="password" id="dbt_square_access_token" name="dbt_square_access_token" value="<?php echo esc_attr( $config['access_token'] ); ?>" class="regular-text">
-                        <p class="description">Keep this secret! From Square Developer Dashboard</p>
+                        <input type="password" id="dbt_square_access_token" name="dbt_square_access_token" value="<?php echo esc_attr( $config['access_token'] ); ?>" class="regular-text" style="width: 400px;">
+                        <p class="description"><strong>Keep this secret!</strong> From Square Developer Dashboard</p>
                     </td>
                 </tr>
                 <tr>
                     <th><label for="dbt_square_location_id">Location ID</label></th>
                     <td>
-                        <input type="text" id="dbt_square_location_id" name="dbt_square_location_id" value="<?php echo esc_attr( $config['location_id'] ); ?>" class="regular-text">
+                        <input type="text" id="dbt_square_location_id" name="dbt_square_location_id" value="<?php echo esc_attr( $config['location_id'] ); ?>" class="regular-text" style="width: 400px;">
                         <p class="description">Your Square business location ID</p>
                     </td>
+                </tr>
+                
+                <tr>
+                    <th colspan="2"><h2>Webhook Configuration</h2></th>
                 </tr>
                 <tr>
                     <th>Webhook URL</th>
                     <td>
                         <code><?php echo esc_html( $config['webhook_url'] ); ?></code>
-                        <p class="description">Add this URL to Square Webhooks when ready</p>
+                        <p class="description">Add this URL to Square Webhooks in your Square Developer Dashboard</p>
                     </td>
                 </tr>
             </table>
@@ -970,6 +1008,18 @@ function dbt_square_settings_page() {
                 <input type="submit" name="dbt_square_save" class="button-primary" value="Save Settings">
             </p>
         </form>
+        
+        <hr>
+        
+        <h2>Testing</h2>
+        <p>In sandbox mode, use these test card numbers:</p>
+        <ul>
+            <li><strong>Success:</strong> 4111 1111 1111 1111</li>
+            <li><strong>CVV:</strong> Any 3 digits</li>
+            <li><strong>Expiration:</strong> Any future date</li>
+            <li><strong>ZIP:</strong> Any valid ZIP code</li>
+        </ul>
+        
     </div>
     <?php
 }

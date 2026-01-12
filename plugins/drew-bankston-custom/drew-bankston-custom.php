@@ -22,6 +22,7 @@ require_once DBC_PATH . 'includes/class-meta-boxes.php';
 require_once DBC_PATH . 'includes/class-schema.php';
 require_once DBC_PATH . 'includes/class-newsletter.php';
 require_once DBC_PATH . 'includes/class-cart.php';
+require_once DBC_PATH . 'includes/class-square-payment.php';
 
 /**
  * Initialize the plugin
@@ -35,6 +36,7 @@ function dbc_init() {
     DBC_Schema::init();
     DBC_Newsletter::init();
     DBC_Cart::init();
+    DBC_Square_Payment::init();
 }
 add_action( 'init', 'dbc_init', 0 );
 
@@ -43,6 +45,7 @@ add_action( 'init', 'dbc_init', 0 );
  */
 function dbc_activate() {
     dbc_init();
+    DBC_Square_Payment::create_orders_table();
     flush_rewrite_rules();
 }
 register_activation_hook( __FILE__, 'dbc_activate' );
@@ -222,6 +225,98 @@ function dbc_fix_book_formats() {
     wp_die( $output, 'Book Formats Fixed', array( 'response' => 200 ) );
 }
 add_action( 'admin_init', 'dbc_fix_book_formats' );
+
+/**
+ * Admin action to save Square credentials
+ * Trigger via: /wp-admin/?dbc_save_square=1
+ */
+function dbc_save_square_credentials() {
+    if ( ! isset( $_GET['dbc_save_square'] ) || ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+    
+    // Save Square sandbox credentials
+    update_option( 'dbt_square_app_id', 'sandbox-sq0idb-aF_D7It7VkqCHd7yDnqifw' );
+    update_option( 'dbt_square_access_token', 'EAAAlx-2IkBbfC5vlCfeKL4bGaRx-CGSuFQ11Nb5NviFB4oJ7cg2ew22HzzTRtS0' );
+    update_option( 'dbt_square_location_id', 'LTZ598K5Y8CVJ' );
+    update_option( 'dbt_square_sandbox', '1' ); // Enable sandbox mode
+
+    // Create orders table
+    DBC_Square_Payment::create_orders_table();
+
+    // Flush rewrite rules for webhook endpoint
+    flush_rewrite_rules();
+
+    $output = '<h1>✓ Square Credentials Saved Successfully!</h1>';
+    $output .= '<p>Sandbox Mode: <strong>ENABLED</strong></p>';
+    $output .= '<ul>';
+    $output .= '<li>Application ID: sandbox-sq0idb-aF_D7It7VkqCHd7yDnqifw</li>';
+    $output .= '<li>Location ID: LTZ598K5Y8CVJ</li>';
+    $output .= '<li>Orders table created</li>';
+    $output .= '<li>Webhook endpoint registered: <code>/square-webhook/</code></li>';
+    $output .= '</ul>';
+    $output .= '<p><a href="' . admin_url( 'options-general.php?page=dbt-square' ) . '">View Square Settings →</a></p>';
+    $output .= '<p><a href="' . home_url( '/checkout/' ) . '">Test Checkout Page →</a></p>';
+    
+    wp_die( $output, 'Square Credentials Saved', array( 'response' => 200 ) );
+}
+add_action( 'init', 'dbc_save_square_credentials', 99 ); // Run late on init hook
+
+/**
+ * Admin action to create Square orders table
+ * Trigger via: /wp-admin/?dbc_create_orders_table=1
+ */
+function dbc_create_orders_table_admin() {
+    if ( ! isset( $_GET['dbc_create_orders_table'] ) || ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+    
+    // Create orders table
+    DBC_Square_Payment::create_orders_table();
+    
+    // Flush rewrite rules for webhook endpoint
+    flush_rewrite_rules();
+    
+    $output = '<h1>✓ Square Orders Table Created!</h1>';
+    $output .= '<p>The database table for storing orders has been created successfully.</p>';
+    $output .= '<p>Webhook endpoint registered: <code>/square-webhook/</code></p>';
+    $output .= '<p><a href="' . admin_url( 'options-general.php?page=dbt-square' ) . '">View Square Settings →</a></p>';
+    $output .= '<p><a href="' . home_url( '/checkout/' ) . '">Test Checkout Page →</a></p>';
+    
+    wp_die( $output, 'Orders Table Created', array( 'response' => 200 ) );
+}
+add_action( 'init', 'dbc_create_orders_table_admin', 99 );
+
+/**
+ * Admin action to fix orders table (add missing user_id column)
+ * Trigger via: /wp-admin/?dbc_fix_orders_table=1
+ */
+function dbc_fix_orders_table_admin() {
+    if ( ! isset( $_GET['dbc_fix_orders_table'] ) || ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+    
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'dbc_orders';
+    
+    // Check if user_id column exists
+    $column_exists = $wpdb->get_results( $wpdb->prepare(
+        "SHOW COLUMNS FROM $table_name LIKE %s",
+        'user_id'
+    ) );
+    
+    if ( empty( $column_exists ) ) {
+        // Add user_id column
+        $wpdb->query( "ALTER TABLE $table_name ADD COLUMN user_id bigint(20) DEFAULT NULL AFTER id" );
+        $wpdb->query( "ALTER TABLE $table_name ADD KEY user_id (user_id)" );
+        $output = '<h1>✓ Orders Table Fixed!</h1><p>Added user_id column successfully.</p>';
+    } else {
+        $output = '<h1>✓ Orders Table OK</h1><p>user_id column already exists.</p>';
+    }
+    
+    wp_die( $output, 'Fix Orders Table', array( 'response' => 200 ) );
+}
+add_action( 'init', 'dbc_fix_orders_table_admin', 99 );
 
 /**
  * Admin action to create cart/checkout pages
