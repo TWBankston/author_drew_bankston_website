@@ -250,8 +250,11 @@ class DBC_Square_Payment {
 
         $order_id = $wpdb->insert_id;
 
-        // Send order confirmation email
+        // Send order confirmation email to customer
         self::send_order_confirmation_email( $order_id );
+        
+        // Send sale notification email to author
+        self::send_sale_notification_email( $order_id );
 
         return $order_id;
     }
@@ -306,9 +309,233 @@ class DBC_Square_Payment {
             $items_html
         );
 
-        $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+        $headers = array( 
+            'Content-Type: text/html; charset=UTF-8',
+            'From: Drew Bankston <noreply@drewbankston.com>',
+        );
         
         wp_mail( $to, $subject, $message, $headers );
+    }
+
+    /**
+     * Send sale notification email to author
+     */
+    private static function send_sale_notification_email( $order_id ) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'dbc_orders';
+        
+        $order = $wpdb->get_row( $wpdb->prepare( 
+            "SELECT * FROM $table_name WHERE id = %d", 
+            $order_id 
+        ) );
+
+        if ( ! $order ) {
+            return;
+        }
+
+        $to = 'author@drewbankston.com';
+        $subject = '🎉 New Book Sale! Order #' . $order_id . ' - $' . number_format( $order->total_amount, 2 );
+        
+        $items = json_decode( $order->order_items, true );
+        $address = json_decode( $order->shipping_address, true );
+        
+        $items_html = '';
+        $has_physical = false;
+        
+        if ( is_array( $items ) ) {
+            foreach ( $items as $item ) {
+                $item_total = floatval( $item['price'] ?? 0 ) * intval( $item['quantity'] ?? 1 );
+                $items_html .= sprintf(
+                    '<tr>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">%s</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center;">%d</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: right;">$%s</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: right;">$%s</td>
+                    </tr>',
+                    esc_html( $item['name'] ?? 'Unknown Item' ),
+                    intval( $item['quantity'] ?? 1 ),
+                    number_format( floatval( $item['price'] ?? 0 ), 2 ),
+                    number_format( $item_total, 2 )
+                );
+                
+                // Check if physical item
+                if ( isset( $item['type'] ) && $item['type'] === 'signed' ) {
+                    $has_physical = true;
+                }
+            }
+        }
+        
+        // Build shipping address HTML
+        $shipping_html = '<p style="color: #8b9dc3;"><em>No shipping required (digital only)</em></p>';
+        if ( $has_physical && $address && ! empty( $address['address_1'] ) ) {
+            $shipping_html = sprintf(
+                '<p style="margin: 0; color: #c9d1e3; line-height: 1.6;">
+                    %s<br>
+                    %s%s<br>
+                    %s, %s %s<br>
+                    %s
+                </p>',
+                esc_html( $order->customer_name ),
+                esc_html( $address['address_1'] ),
+                ! empty( $address['address_2'] ) ? '<br>' . esc_html( $address['address_2'] ) : '',
+                esc_html( $address['city'] ?? '' ),
+                esc_html( $address['state'] ?? '' ),
+                esc_html( $address['zip'] ?? '' ),
+                esc_html( $address['country'] ?? 'US' )
+            );
+        }
+        
+        // Build signature request HTML
+        $signature_html = '';
+        if ( $order->signature_request ) {
+            $signature_html = sprintf(
+                '<div style="background: linear-gradient(135deg, #3d2b5c 0%%, #2d1f45 100%%); padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #a78bfa;">
+                    <h3 style="margin: 0 0 10px; color: #a78bfa; font-size: 16px;">✍️ Personalized Signature Requested</h3>
+                    <blockquote style="margin: 0; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 6px; font-style: italic; color: #e9d5ff;">
+                        %s
+                    </blockquote>
+                </div>',
+                ! empty( $order->signature_message ) ? esc_html( $order->signature_message ) : '<em>No specific message provided</em>'
+            );
+        }
+
+        $message = self::get_author_email_template(
+            '🎉 New Order!',
+            sprintf(
+                '<div style="text-align: center; margin-bottom: 30px;">
+                    <div style="display: inline-block; background: linear-gradient(135deg, #10b981 0%%, #059669 100%%); color: white; font-size: 32px; font-weight: 700; padding: 15px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);">
+                        $%s
+                    </div>
+                    <p style="margin: 15px 0 0; color: #8b9dc3; font-size: 14px;">Order #%d</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px;">
+                        <h3 style="margin: 0 0 15px; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Customer</h3>
+                        <p style="margin: 0 0 8px; color: #ffffff; font-weight: 600; font-size: 18px;">%s</p>
+                        <p style="margin: 0 0 5px;"><a href="mailto:%s" style="color: #60a5fa; text-decoration: none;">%s</a></p>
+                        %s
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px;">
+                        <h3 style="margin: 0 0 15px; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Ship To</h3>
+                        %s
+                    </div>
+                </div>
+                
+                %s
+                
+                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                    <h3 style="margin: 0 0 15px; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Order Items</h3>
+                    <table style="width: 100%%; border-collapse: collapse; color: #c9d1e3;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                <th style="padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b9dc3;">Item</th>
+                                <th style="padding: 12px; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b9dc3;">Qty</th>
+                                <th style="padding: 12px; text-align: right; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b9dc3;">Price</th>
+                                <th style="padding: 12px; text-align: right; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b9dc3;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            %s
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" style="padding: 15px 12px; text-align: right; font-weight: 600; color: #ffffff; border-top: 2px solid rgba(255,255,255,0.1);">Total</td>
+                                <td style="padding: 15px 12px; text-align: right; font-weight: 700; font-size: 20px; color: #10b981; border-top: 2px solid rgba(255,255,255,0.1);">$%s</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="%s" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%%, #6d28d9 100%%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);">
+                        View Order in Dashboard →
+                    </a>
+                </div>',
+                number_format( $order->total_amount, 2 ),
+                $order_id,
+                esc_html( $order->customer_name ),
+                esc_attr( $order->customer_email ),
+                esc_html( $order->customer_email ),
+                ! empty( $order->customer_phone ) ? '<p style="margin: 5px 0 0; color: #8b9dc3;">' . esc_html( $order->customer_phone ) . '</p>' : '',
+                $shipping_html,
+                $signature_html,
+                $items_html,
+                number_format( $order->total_amount, 2 ),
+                admin_url( 'admin.php?page=dbc-orders' )
+            )
+        );
+
+        $headers = array( 
+            'Content-Type: text/html; charset=UTF-8',
+            'From: Drew Bankston Website <noreply@drewbankston.com>',
+        );
+        
+        wp_mail( $to, $subject, $message, $headers );
+    }
+    
+    /**
+     * Get branded email template for author notifications
+     */
+    private static function get_author_email_template( $title, $content ) {
+        return '<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #0a0a0f; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Oxygen, Ubuntu, sans-serif;">
+    <table role="presentation" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 40px 20px;">
+                <table role="presentation" style="max-width: 700px; margin: 0 auto; background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%); border-radius: 16px; overflow: hidden; box-shadow: 0 25px 80px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 30px 40px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%); border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <table role="presentation" style="width: 100%;">
+                                <tr>
+                                    <td>
+                                        <h1 style="margin: 0; font-size: 20px; font-weight: 600; color: #ffffff;">Drew Bankston</h1>
+                                        <p style="margin: 5px 0 0; font-size: 12px; color: #8b9dc3; text-transform: uppercase; letter-spacing: 2px;">Sales Dashboard</p>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <span style="display: inline-block; background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">New Sale</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <div style="color: #c9d1e3; font-size: 15px; line-height: 1.7;">
+                                ' . $content . '
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 25px 40px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.1);">
+                            <table role="presentation" style="width: 100%;">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <p style="margin: 0; font-size: 12px; color: #5a6785;">
+                                            This is an automated notification from your website.<br>
+                                            <a href="https://drewbankston.com/wp-admin" style="color: #60a5fa; text-decoration: none;">Login to Dashboard</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
     }
 
     /**

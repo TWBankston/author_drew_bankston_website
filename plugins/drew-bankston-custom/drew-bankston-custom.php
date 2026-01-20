@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBC_VERSION', '1.5.0' );
+define( 'DBC_VERSION', '1.6.0' );
 define( 'DBC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'DBC_URL', plugin_dir_url( __FILE__ ) );
 
@@ -23,6 +23,7 @@ require_once DBC_PATH . 'includes/class-schema.php';
 require_once DBC_PATH . 'includes/class-newsletter.php';
 require_once DBC_PATH . 'includes/class-cart.php';
 require_once DBC_PATH . 'includes/class-square-payment.php';
+require_once DBC_PATH . 'includes/class-orders-admin.php';
 
 /**
  * Initialize the plugin
@@ -37,6 +38,7 @@ function dbc_init() {
     DBC_Newsletter::init();
     DBC_Cart::init();
     DBC_Square_Payment::init();
+    DBC_Orders_Admin::init();
 }
 add_action( 'init', 'dbc_init', 0 );
 
@@ -376,4 +378,41 @@ function dbc_create_shop_pages() {
 }
 add_action( 'admin_init', 'dbc_create_shop_pages' );
 
+/**
+ * Admin action to update Kindle URLs for all books
+ * Trigger via: /wp-admin/?dbc_update_kindle_urls=1
+ */
+function dbc_update_kindle_urls() {
+    if ( ! isset( $_GET['dbc_update_kindle_urls'] ) || ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    // Book ID => Kindle URL mapping
+    $kindle_urls = array(
+        9  => 'https://www.amazon.com/Khizara-Book-Tokorel-Drew-Bankston-ebook/dp/B0C8S4TJWW/ref=tmm_kin_swatch_0',
+        10 => 'https://www.amazon.com/Tokorel-Book-2-Drew-Bankston-ebook/dp/B0DB4LXC68/ref=sr_1_1',
+        11 => 'https://www.amazon.com/Lines-Force-Weekend-Adventures-Andrew-ebook/dp/B0DG9W4P23/ref=sr_1_1',
+        12 => 'https://www.amazon.com/Monsters-Lap-Drew-Bankston-ebook/dp/B0151Z52BU/ref=sr_1_1',
+        13 => 'https://www.amazon.com/Imagination-Stone-Drew-Bankston-ebook/dp/B0DSZHQMTD/ref=sr_1_1',
+        14 => 'https://www.amazon.com/Sounds-Tomorrow-Drew-Bankston-ebook/dp/B00IP4R8IU/ref=sr_1_1',
+    );
+
+    $updated = array();
+
+    foreach ( $kindle_urls as $post_id => $kindle_url ) {
+        $post = get_post( $post_id );
+        if ( $post && $post->post_type === 'book' ) {
+            update_post_meta( $post_id, '_dbc_book_kindle_url', esc_url_raw( $kindle_url ) );
+            $updated[] = esc_html( $post->post_title ) . ' (ID: ' . $post_id . ')';
+        }
+    }
+
+    $output = '<h1>✓ Kindle URLs Updated!</h1>';
+    $output .= '<p>Updated ' . count( $updated ) . ' books:</p>';
+    $output .= '<ul><li>' . implode( '</li><li>', $updated ) . '</li></ul>';
+    $output .= '<p><a href="' . admin_url( 'edit.php?post_type=book' ) . '">Back to Books</a></p>';
+
+    wp_die( $output, 'Update Kindle URLs', array( 'response' => 200 ) );
+}
+add_action( 'init', 'dbc_update_kindle_urls', 99 );
 
