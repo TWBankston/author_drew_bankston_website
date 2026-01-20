@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBC_VERSION', '1.6.0' );
+define( 'DBC_VERSION', '1.7.0' );
 define( 'DBC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'DBC_URL', plugin_dir_url( __FILE__ ) );
 
@@ -24,6 +24,7 @@ require_once DBC_PATH . 'includes/class-newsletter.php';
 require_once DBC_PATH . 'includes/class-cart.php';
 require_once DBC_PATH . 'includes/class-square-payment.php';
 require_once DBC_PATH . 'includes/class-orders-admin.php';
+require_once DBC_PATH . 'includes/class-orders-settings.php';
 
 /**
  * Initialize the plugin
@@ -39,6 +40,7 @@ function dbc_init() {
     DBC_Cart::init();
     DBC_Square_Payment::init();
     DBC_Orders_Admin::init();
+    DBC_Orders_Settings::init();
 }
 add_action( 'init', 'dbc_init', 0 );
 

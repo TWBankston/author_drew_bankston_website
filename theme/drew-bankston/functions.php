@@ -5,9 +5,23 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DBT_VERSION', '3.4.7' );
+define( 'DBT_VERSION', '3.9.0' );
 define( 'DBT_PATH', get_template_directory() );
 define( 'DBT_URL', get_template_directory_uri() );
+
+/**
+ * Prevent caching for logged-in users
+ * This ensures the login state is properly reflected on all pages
+ */
+function dbt_no_cache_for_logged_in() {
+    if ( is_user_logged_in() ) {
+        nocache_headers();
+        header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
+        header( 'Pragma: no-cache' );
+        header( 'Expires: Thu, 01 Jan 1970 00:00:00 GMT' );
+    }
+}
+add_action( 'send_headers', 'dbt_no_cache_for_logged_in' );
 
 /**
  * Theme setup
@@ -87,14 +101,26 @@ function dbt_login_styles() {
             margin-bottom: 30px;
         }
         
+        /* Main login container - make wider */
+        #login {
+            width: 400px !important;
+            max-width: 95vw !important;
+            padding: 8% 0 0 !important;
+        }
+        
         /* Login form container - matches main site card style */
         .login form,
-        #loginform {
+        #loginform,
+        #resetpassform {
             background: rgba(23, 28, 42, 0.95) !important;
             border: 1px solid rgba(199, 184, 255, 0.12) !important;
             border-radius: 16px !important;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
             padding: 30px 24px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow: visible !important;
+            box-sizing: border-box !important;
         }
         
         /* Labels */
@@ -109,7 +135,9 @@ function dbt_login_styles() {
         .login input[type="password"],
         .login input[type="email"],
         #user_login,
-        #user_pass {
+        #user_pass,
+        #pass1,
+        #pass2 {
             background: rgba(13, 15, 18, 0.9) !important;
             border: 1px solid rgba(199, 184, 255, 0.2) !important;
             border-radius: 8px !important;
@@ -119,17 +147,104 @@ function dbt_login_styles() {
             margin-top: 8px !important;
             transition: all 0.2s ease !important;
             box-shadow: none !important;
+            -webkit-text-fill-color: #fff !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* Override browser autofill styles */
+        .login input[type="text"]:-webkit-autofill,
+        .login input[type="password"]:-webkit-autofill,
+        .login input[type="email"]:-webkit-autofill,
+        #user_login:-webkit-autofill,
+        #user_pass:-webkit-autofill,
+        #pass1:-webkit-autofill,
+        #pass2:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px rgba(13, 15, 18, 0.9) inset !important;
+            -webkit-text-fill-color: #fff !important;
+            border: 1px solid rgba(199, 184, 255, 0.2) !important;
+            background-color: rgba(13, 15, 18, 0.9) !important;
+            color: #fff !important;
+            caret-color: #fff !important;
+        }
+        
+        /* Autofill + focus combined */
+        .login input[type="text"]:-webkit-autofill:focus,
+        .login input[type="password"]:-webkit-autofill:focus,
+        .login input[type="email"]:-webkit-autofill:focus,
+        #user_login:-webkit-autofill:focus,
+        #user_pass:-webkit-autofill:focus,
+        #pass1:-webkit-autofill:focus,
+        #pass2:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px rgba(13, 15, 18, 1) inset, 0 0 0 3px rgba(199, 184, 255, 0.15) !important;
+            -webkit-text-fill-color: #fff !important;
+            background-color: rgba(13, 15, 18, 1) !important;
+            border-color: #c7b8ff !important;
+            color: #fff !important;
         }
         
         .login input[type="text"]:focus,
         .login input[type="password"]:focus,
         .login input[type="email"]:focus,
         #user_login:focus,
-        #user_pass:focus {
+        #user_pass:focus,
+        #pass1:focus,
+        #pass2:focus {
             background: rgba(13, 15, 18, 1) !important;
+            background-color: rgba(13, 15, 18, 1) !important;
             border-color: #c7b8ff !important;
             box-shadow: 0 0 0 3px rgba(199, 184, 255, 0.15) !important;
             outline: none !important;
+            color: #fff !important;
+            -webkit-text-fill-color: #fff !important;
+            caret-color: #fff !important;
+        }
+        
+        /* Password field wrappers - force full width but don't change display */
+        .login .user-pass-wrap,
+        .login .user-pass1-wrap,
+        .login .user-pass2-wrap,
+        .login .pw-wrap,
+        .login .wp-pwd,
+        .login .wp-pwd.is-open {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        
+        /* Password input specifically - override size attribute */
+        .login input.password-input,
+        .login #pass1,
+        .login #pass2,
+        input[name="pass1"],
+        input[name="pass2"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+        }
+        
+        /* Hint/description text - prevent overflow */
+        .login .password-input-wrapper .description,
+        .login p.description,
+        .login .description.indicator-hint {
+            max-width: 100% !important;
+            width: 100% !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            box-sizing: border-box !important;
+        }
+        
+        /* Password strength indicator */
+        .pw-weak, .pw-medium, .pw-strong {
+            color: #fff !important;
+        }
+        
+        #pass-strength-result {
+            background-color: rgba(13, 15, 18, 0.8) !important;
+            border: 1px solid rgba(199, 184, 255, 0.2) !important;
+            color: #fff !important;
+            width: 100% !important;
+            margin-top: 8px !important;
         }
         
         /* Input placeholder */
@@ -638,7 +753,7 @@ function dbt_login_logo_title() {
 add_filter( 'login_headertext', 'dbt_login_logo_title' );
 
 /**
- * Custom login redirect - send users back to the page they came from
+ * Custom login redirect - send non-admin users to frontend, never admin dashboard
  */
 function dbt_login_redirect( $redirect_to, $requested_redirect_to, $user ) {
     // If there's an error, don't redirect
@@ -646,15 +761,61 @@ function dbt_login_redirect( $redirect_to, $requested_redirect_to, $user ) {
         return $redirect_to;
     }
     
-    // If a specific redirect was requested (via redirect_to parameter), use it
-    if ( ! empty( $requested_redirect_to ) ) {
-        return $requested_redirect_to;
+    // Get user object if we have an ID
+    if ( is_numeric( $user ) ) {
+        $user = get_userdata( $user );
     }
     
-    // Default: redirect to account page instead of admin dashboard
-    return home_url( '/account/' );
+    // If user is not an administrator, ALWAYS redirect to frontend
+    if ( $user && ! in_array( 'administrator', (array) $user->roles ) ) {
+        // Never send non-admins to wp-admin
+        if ( strpos( $redirect_to, 'wp-admin' ) !== false || 
+             strpos( $requested_redirect_to, 'wp-admin' ) !== false ) {
+            return home_url( '/account/' );
+        }
+        
+        // If a valid frontend redirect was requested, use it
+        if ( ! empty( $requested_redirect_to ) && strpos( $requested_redirect_to, home_url() ) === 0 ) {
+            return $requested_redirect_to;
+        }
+        
+        // Default: redirect to account page
+        return home_url( '/account/' );
+    }
+    
+    // Admins can go wherever they want
+    return $redirect_to;
 }
 add_filter( 'login_redirect', 'dbt_login_redirect', 10, 3 );
+
+/**
+ * Set a JavaScript-readable cookie when user logs in
+ * WordPress cookies are httpOnly, so JS can't read them
+ */
+function dbt_set_login_cookie( $user_login, $user ) {
+    // Set a simple cookie that JavaScript can read (not httpOnly)
+    setcookie( 'dbt_logged_in', '1', time() + ( 14 * DAY_IN_SECONDS ), COOKIEPATH, COOKIE_DOMAIN, is_ssl(), false );
+}
+add_action( 'wp_login', 'dbt_set_login_cookie', 10, 2 );
+
+/**
+ * Clear the JS-readable cookie when user logs out
+ */
+function dbt_clear_login_cookie() {
+    setcookie( 'dbt_logged_in', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), false );
+}
+add_action( 'wp_logout', 'dbt_clear_login_cookie' );
+
+/**
+ * Also set the cookie on init if user is logged in but cookie doesn't exist
+ * This handles cases where cookie was lost or user was already logged in
+ */
+function dbt_ensure_login_cookie() {
+    if ( is_user_logged_in() && ! isset( $_COOKIE['dbt_logged_in'] ) ) {
+        setcookie( 'dbt_logged_in', '1', time() + ( 14 * DAY_IN_SECONDS ), COOKIEPATH, COOKIE_DOMAIN, is_ssl(), false );
+    }
+}
+add_action( 'init', 'dbt_ensure_login_cookie' );
 
 /**
  * Custom registration redirect - send users back to the page they came from
@@ -669,6 +830,16 @@ function dbt_registration_redirect( $redirect_to ) {
     return home_url( '/account/' );
 }
 add_filter( 'registration_redirect', 'dbt_registration_redirect' );
+
+/**
+ * Redirect after password reset - go to login page with success message
+ */
+function dbt_password_reset_redirect() {
+    // Redirect to login page after password reset, not admin
+    wp_redirect( home_url( '/wp-login.php?password=changed' ) );
+    exit;
+}
+add_action( 'after_password_reset', 'dbt_password_reset_redirect' );
 
 /**
  * Pass redirect_to parameter through registration form

@@ -10,8 +10,12 @@ $cart = DBC_Cart::get_cart();
 $cart_count = DBC_Cart::get_cart_count();
 $subtotal = DBC_Cart::get_subtotal();
 $shipping = DBC_Cart::get_shipping_cost();
-$total = DBC_Cart::get_total();
 $has_physical = DBC_Cart::has_physical_items();
+
+// Get applied discount
+$applied_discount = DBC_Orders_Settings::get_applied_discount();
+$discount_amount = $applied_discount ? $applied_discount['amount'] : 0;
+$total = $subtotal - $discount_amount + $shipping;
 
 // Redirect to cart if empty
 if ( empty( $cart ) ) {
@@ -253,7 +257,7 @@ foreach ( $cart as $item ) {
                 
                 <!-- Payment -->
                 <div class="checkout-block">
-                    <h2 class="checkout-block__title">Payment</h2>
+                    <h2 class="checkout-block__title">Payment Information</h2>
                     
                     <?php 
                     $square_config = dbt_get_square_config();
@@ -272,10 +276,51 @@ foreach ( $cart as $item ) {
                         </p>
                     </div>
                     <?php else : ?>
+                    <!-- Payment Method Info -->
+                    <div class="payment-methods">
+                        <div class="payment-methods__accepted">
+                            <span class="payment-methods__label">We accept:</span>
+                            <div class="payment-methods__icons">
+                                <svg viewBox="0 0 48 32" class="payment-icon payment-icon--visa">
+                                    <rect width="48" height="32" rx="4" fill="#1434CB"/>
+                                    <text x="24" y="20" fill="white" font-size="14" font-weight="bold" text-anchor="middle" font-family="Arial">VISA</text>
+                                </svg>
+                                <svg viewBox="0 0 48 32" class="payment-icon payment-icon--mastercard">
+                                    <rect width="48" height="32" rx="4" fill="#EB001B"/>
+                                    <circle cx="18" cy="16" r="10" fill="#FF5F00"/>
+                                    <circle cx="30" cy="16" r="10" fill="#F79E1B"/>
+                                </svg>
+                                <svg viewBox="0 0 48 32" class="payment-icon payment-icon--amex">
+                                    <rect width="48" height="32" rx="4" fill="#006FCF"/>
+                                    <text x="24" y="20" fill="white" font-size="11" font-weight="bold" text-anchor="middle" font-family="Arial">AMEX</text>
+                                </svg>
+                                <svg viewBox="0 0 48 32" class="payment-icon payment-icon--discover">
+                                    <rect width="48" height="32" rx="4" fill="#FF6000"/>
+                                    <text x="24" y="20" fill="white" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Arial">DISCOVER</text>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Square Web Payments SDK -->
-                    <div id="square-payment-form">
-                        <div id="card-container"></div>
-                        <div id="payment-status-container" style="display: none; margin-top: 1rem;"></div>
+                    <div id="square-payment-form" class="square-payment-form">
+                        <div id="card-container" class="square-card-container"></div>
+                        <div id="payment-status-container" class="payment-status" style="display: none;"></div>
+                    </div>
+                    
+                    <!-- Security Notice -->
+                    <div class="payment-security">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        <span>Your payment information is encrypted and secure. We never store your full card details.</span>
+                    </div>
+                    
+                    <!-- Alternative Payment Methods Notice -->
+                    <div class="payment-alternative-notice">
+                        <p class="text-muted" style="font-size: var(--text-sm); margin-top: var(--space-4);">
+                            <strong>Need to pay another way?</strong> Contact us at <a href="mailto:orders@drewbankston.com" style="color: var(--color-accent-sky);">orders@drewbankston.com</a> for alternative payment options including PayPal or check.
+                        </p>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -368,11 +413,37 @@ foreach ( $cart as $item ) {
                     <?php endforeach; ?>
                 </div>
                 
+                <!-- Discount Code -->
+                <div class="checkout-discount">
+                    <?php if ( $applied_discount ) : ?>
+                    <div class="checkout-discount__applied">
+                        <div class="checkout-discount__badge">
+                            <span class="checkout-discount__code"><?php echo esc_html( $applied_discount['code'] ); ?></span>
+                            <button type="button" class="checkout-discount__remove" id="remove-discount-btn">×</button>
+                        </div>
+                        <span class="checkout-discount__savings">-$<?php echo number_format( $discount_amount, 2 ); ?></span>
+                    </div>
+                    <?php else : ?>
+                    <div class="checkout-discount__form" id="discount-form">
+                        <input type="text" id="discount-code-input" placeholder="Discount code" class="checkout-discount__input">
+                        <button type="button" id="apply-discount-btn" class="checkout-discount__btn">Apply</button>
+                    </div>
+                    <div class="checkout-discount__error" id="discount-error" style="display: none;"></div>
+                    <?php endif; ?>
+                </div>
+                
                 <div class="checkout-summary__totals">
                     <div class="checkout-summary__row">
                         <span>Subtotal</span>
                         <span>$<?php echo esc_html( number_format( $subtotal, 2 ) ); ?></span>
                     </div>
+                    
+                    <?php if ( $discount_amount > 0 ) : ?>
+                    <div class="checkout-summary__row checkout-summary__row--discount">
+                        <span>Discount</span>
+                        <span class="discount-amount">-$<?php echo esc_html( number_format( $discount_amount, 2 ) ); ?></span>
+                    </div>
+                    <?php endif; ?>
                     
                     <?php if ( $has_physical ) : ?>
                     <div class="checkout-summary__row">
@@ -385,7 +456,7 @@ foreach ( $cart as $item ) {
                     
                     <div class="checkout-summary__row checkout-summary__row--total">
                         <span>Total</span>
-                        <span>$<?php echo esc_html( number_format( $total, 2 ) ); ?></span>
+                        <span id="total-amount">$<?php echo esc_html( number_format( $total, 2 ) ); ?></span>
                     </div>
                 </div>
                 
@@ -529,7 +600,38 @@ updateReviewSection();
     script.onload = async function() {
         try {
             const payments = window.Square.payments(appId, locationId);
-            const card = await payments.card();
+            
+            // Card styling
+            const cardStyle = {
+                '.input-container': {
+                    borderColor: 'rgba(185, 215, 255, 0.3)',
+                    borderRadius: '8px',
+                },
+                '.input-container.is-focus': {
+                    borderColor: 'rgba(185, 215, 255, 0.8)',
+                },
+                '.input-container.is-error': {
+                    borderColor: '#ff6464',
+                },
+                '.message-text': {
+                    color: '#b9d7ff',
+                },
+                '.message-icon': {
+                    color: '#b9d7ff',
+                },
+                input: {
+                    color: '#1a1a1a',
+                    backgroundColor: '#ffffff',
+                    fontSize: '16px',
+                },
+                'input::placeholder': {
+                    color: 'rgba(0, 0, 0, 0.4)',
+                },
+            };
+            
+            const card = await payments.card({ 
+                style: cardStyle
+            });
             await card.attach('#card-container');
             
             // Handle form submission
@@ -637,6 +739,93 @@ updateReviewSection();
     document.head.appendChild(script);
 })();
 <?php endif; ?>
+
+// Discount Code Handling
+(function() {
+    const applyBtn = document.getElementById('apply-discount-btn');
+    const removeBtn = document.getElementById('remove-discount-btn');
+    const codeInput = document.getElementById('discount-code-input');
+    const errorDiv = document.getElementById('discount-error');
+    
+    if (applyBtn && codeInput) {
+        applyBtn.addEventListener('click', function() {
+            const code = codeInput.value.trim().toUpperCase();
+            
+            if (!code) {
+                showError('Please enter a discount code');
+                return;
+            }
+            
+            applyBtn.disabled = true;
+            applyBtn.textContent = 'Applying...';
+            
+            fetch('<?php echo admin_url( 'admin-ajax.php' ); ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'dbc_apply_discount',
+                    nonce: '<?php echo wp_create_nonce( 'dbc_cart_nonce' ); ?>',
+                    code: code
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload page to show discount
+                    location.reload();
+                } else {
+                    showError(data.data.message || 'Invalid discount code');
+                    applyBtn.disabled = false;
+                    applyBtn.textContent = 'Apply';
+                }
+            })
+            .catch(error => {
+                showError('Connection error. Please try again.');
+                applyBtn.disabled = false;
+                applyBtn.textContent = 'Apply';
+            });
+        });
+        
+        // Enter key to apply
+        codeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyBtn.click();
+            }
+        });
+    }
+    
+    if (removeBtn) {
+        removeBtn.addEventListener('click', function() {
+            fetch('<?php echo admin_url( 'admin-ajax.php' ); ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'dbc_remove_discount',
+                    nonce: '<?php echo wp_create_nonce( 'dbc_cart_nonce' ); ?>'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                location.reload();
+            });
+        });
+    }
+    
+    function showError(message) {
+        if (errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+    }
+})();
 </script>
 
 <?php get_footer(); ?>

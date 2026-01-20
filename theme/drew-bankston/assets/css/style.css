@@ -3411,6 +3411,143 @@ lottie-player {
     margin: 0;
 }
 
+/* Payment Methods */
+.payment-methods {
+    margin-bottom: var(--space-6);
+    padding: var(--space-5);
+    background: linear-gradient(135deg, rgba(185, 215, 255, 0.08) 0%, rgba(198, 185, 255, 0.08) 100%);
+    border: 1px solid rgba(185, 215, 255, 0.2);
+    border-radius: var(--radius-md);
+}
+
+.payment-methods__accepted {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.payment-methods__label {
+    font-size: var(--text-base);
+    color: var(--color-text-primary);
+    font-weight: var(--font-semibold);
+    letter-spacing: 0.3px;
+}
+
+.payment-methods__icons {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.payment-icon {
+    width: 56px;
+    height: 36px;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
+}
+
+.payment-icon:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Square Payment Form */
+.square-payment-form {
+    margin-bottom: var(--space-6);
+}
+
+.square-card-container {
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(185, 215, 255, 0.3);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: 100px;
+}
+
+#card-container {
+    min-height: 100px;
+}
+
+.square-card-container iframe {
+    width: 100%;
+    min-height: 100px;
+}
+
+.square-card-container:focus-within {
+    border-color: var(--color-accent-sky);
+    background: rgba(185, 215, 255, 0.05);
+    box-shadow: 0 0 0 4px rgba(185, 215, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.payment-status {
+    margin-top: var(--space-4);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+}
+
+.payment-status--error {
+    background: rgba(255, 100, 100, 0.1);
+    border: 1px solid rgba(255, 100, 100, 0.3);
+    color: #ff6464;
+}
+
+.payment-status--success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+}
+
+/* Payment Security */
+.payment-security {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(185, 215, 255, 0.08) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-5);
+    line-height: 1.6;
+}
+
+.payment-security svg {
+    color: var(--color-accent-green);
+    flex-shrink: 0;
+    margin-top: 2px;
+    filter: drop-shadow(0 2px 4px rgba(34, 197, 94, 0.3));
+}
+
+.payment-alternative-notice {
+    margin-top: var(--space-5);
+    padding: var(--space-4);
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 3px solid var(--color-accent-lavender);
+    border-radius: var(--radius-sm);
+}
+
+.payment-alternative-notice p {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+}
+
+.payment-alternative-notice a {
+    text-decoration: underline;
+    transition: opacity 0.2s ease;
+}
+
+.payment-alternative-notice a:hover {
+    opacity: 0.8;
+}
+
 /* Checkout Summary */
 .checkout-summary {
     background: var(--color-bg-secondary);
@@ -3474,13 +3611,18 @@ lottie-player {
 .checkout-summary__item-details {
     flex: 1;
     min-width: 0;
+    margin-right: var(--space-3);
+    max-width: calc(100% - 100px);
 }
 
 .checkout-summary__item-name {
     font-size: var(--text-sm);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: block !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+    line-height: 1.4;
+    max-width: 100%;
 }
 
 .checkout-summary__item-price {
@@ -3511,6 +3653,124 @@ lottie-player {
     height: 1px;
     background: rgba(255, 255, 255, 0.1);
     margin: var(--space-4) 0;
+}
+
+/* Discount Code Styles */
+.checkout-discount {
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.checkout-discount__form {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.checkout-discount__input {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+}
+
+.checkout-discount__input::placeholder {
+    color: var(--color-text-secondary);
+    text-transform: none;
+}
+
+.checkout-discount__input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.checkout-discount__btn {
+    padding: var(--space-2) var(--space-4);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.checkout-discount__btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.checkout-discount__btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.checkout-discount__error {
+    margin-top: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--radius-sm);
+    color: #ef4444;
+    font-size: var(--text-xs);
+}
+
+.checkout-discount__applied {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.checkout-discount__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: var(--radius-full);
+}
+
+.checkout-discount__code {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-primary);
+}
+
+.checkout-discount__remove {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.checkout-discount__remove:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.checkout-discount__savings {
+    font-weight: var(--font-medium);
+    color: #10b981;
+}
+
+.checkout-summary__row--discount .discount-amount {
+    color: #10b981;
+    font-weight: var(--font-medium);
 }
 
 .checkout-summary__note {
@@ -3658,8 +3918,10 @@ lottie-player {
     }
     
     .checkout-summary--mobile-top .checkout-summary__item-name {
-        word-break: break-word;
-        overflow-wrap: break-word;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+        display: inline-block !important;
     }
     
     .checkout-summary__edit {
@@ -4362,3 +4624,392 @@ lottie-player {
     justify-content: flex-end;
 }
 
+/* ========================================
+   UPCOMING PROJECTS PAGE
+   ======================================== */
+
+/* Hero Centered Variant */
+.hero--upcoming {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+}
+
+.hero__content--centered {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.hero__content--centered .hero__eyebrow {
+    margin-bottom: var(--space-4);
+}
+
+.hero__content--centered .hero__title {
+    margin-bottom: var(--space-4);
+}
+
+.hero__content--centered .hero__subtitle {
+    margin-bottom: 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Intro Section */
+.upcoming-intro {
+    text-align: center;
+    padding: var(--space-8) 0;
+}
+
+.upcoming-intro__text {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Upcoming Projects Grid */
+.upcoming-projects {
+    padding-bottom: var(--space-16);
+}
+
+.upcoming-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--space-8);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .upcoming-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-6);
+    }
+}
+
+/* Upcoming Card */
+.upcoming-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.upcoming-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 60px -15px rgba(139, 92, 246, 0.2);
+}
+
+.upcoming-card__cover {
+    position: relative;
+    aspect-ratio: 2/3;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+}
+
+.upcoming-card__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.upcoming-card:hover .upcoming-card__cover img {
+    transform: scale(1.05);
+}
+
+.upcoming-card__badge {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(167, 139, 250, 0.9) 100%);
+    color: #fff;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+}
+
+.upcoming-card__badge--mystery {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.9) 0%, rgba(167, 139, 250, 0.9) 100%);
+    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4);
+}
+
+.upcoming-card__content {
+    padding: var(--space-6);
+}
+
+.upcoming-card__series {
+    display: inline-block;
+    font-size: var(--text-sm);
+    color: var(--color-accent-lavender);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-2);
+}
+
+.upcoming-card__series--mystery {
+    background: linear-gradient(90deg, var(--color-accent-lavender), var(--color-accent-pink), var(--color-accent-sky));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.upcoming-card__title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-3);
+}
+
+.upcoming-card__title--mystery {
+    background: linear-gradient(90deg, #f8fafc, var(--color-accent-lavender));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.upcoming-card__description {
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-5);
+}
+
+.upcoming-card__actions {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.btn--mystery {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(167, 139, 250, 0.2) 100%);
+    border-color: rgba(236, 72, 153, 0.5);
+}
+
+.btn--mystery:hover {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(167, 139, 250, 0.3) 100%);
+    border-color: rgba(236, 72, 153, 0.8);
+}
+
+/* Mystery Placeholder - Magical Book Cover */
+.mystery-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.mystery-placeholder__bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #1e1b4b 100%);
+}
+
+/* Animated Stars Background */
+.mystery-placeholder__stars {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.5), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(167, 139, 250, 0.6), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.4), transparent),
+        radial-gradient(2px 2px at 130px 80px, rgba(34, 211, 238, 0.5), transparent),
+        radial-gradient(1px 1px at 160px 120px, rgba(255, 255, 255, 0.3), transparent),
+        radial-gradient(2px 2px at 200px 50px, rgba(244, 114, 182, 0.5), transparent),
+        radial-gradient(1px 1px at 250px 150px, rgba(255, 255, 255, 0.4), transparent),
+        radial-gradient(2px 2px at 300px 90px, rgba(167, 139, 250, 0.5), transparent);
+    background-size: 350px 200px;
+    animation: twinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Nebula Glow */
+.mystery-placeholder__nebula {
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(ellipse 80% 50% at 30% 40%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 70% at 70% 60%, rgba(236, 72, 153, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 40% at 50% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%);
+    animation: nebulaPulse 8s ease-in-out infinite;
+}
+
+@keyframes nebulaPulse {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Floating Orbs */
+.mystery-placeholder__orbs {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.mystery-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(20px);
+}
+
+.mystery-orb--1 {
+    width: 100px;
+    height: 100px;
+    background: rgba(139, 92, 246, 0.3);
+    top: 10%;
+    left: 10%;
+    animation: orbFloat1 6s ease-in-out infinite;
+}
+
+.mystery-orb--2 {
+    width: 80px;
+    height: 80px;
+    background: rgba(236, 72, 153, 0.25);
+    top: 60%;
+    right: 15%;
+    animation: orbFloat2 7s ease-in-out infinite;
+}
+
+.mystery-orb--3 {
+    width: 60px;
+    height: 60px;
+    background: rgba(34, 211, 238, 0.25);
+    bottom: 20%;
+    left: 20%;
+    animation: orbFloat3 5s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(20px, -20px) scale(1.1); }
+}
+
+@keyframes orbFloat2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-15px, 25px) scale(0.9); }
+}
+
+@keyframes orbFloat3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(25px, -10px) scale(1.15); }
+}
+
+/* Central Mystery Icon */
+.mystery-placeholder__icon {
+    position: relative;
+    z-index: 3;
+    width: 120px;
+    height: 120px;
+    animation: iconFloat 3s ease-in-out infinite;
+}
+
+.mystery-placeholder__icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.sparkle {
+    animation: sparkleGlow 2s ease-in-out infinite;
+}
+
+.sparkle--1 { animation-delay: 0s; }
+.sparkle--2 { animation-delay: 0.5s; }
+.sparkle--3 { animation-delay: 1s; }
+.sparkle--4 { animation-delay: 1.5s; }
+
+@keyframes sparkleGlow {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes iconFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Magical Rings */
+.mystery-placeholder__rings {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.mystery-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid;
+}
+
+.mystery-ring--outer {
+    width: 200px;
+    height: 200px;
+    border-color: rgba(167, 139, 250, 0.2);
+    animation: ringRotate 20s linear infinite;
+}
+
+.mystery-ring--inner {
+    width: 150px;
+    height: 150px;
+    border-color: rgba(34, 211, 238, 0.15);
+    animation: ringRotate 15s linear infinite reverse;
+}
+
+.mystery-ring--outer::before,
+.mystery-ring--inner::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: currentColor;
+    border-radius: 50%;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 10px currentColor;
+}
+
+.mystery-ring--outer::before {
+    background: var(--color-accent-lavender);
+    box-shadow: 0 0 15px var(--color-accent-lavender);
+}
+
+.mystery-ring--inner::before {
+    background: var(--color-accent-sky);
+    box-shadow: 0 0 15px var(--color-accent-sky);
+}
+
+@keyframes ringRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Mystery Card Hover Effects */
+.upcoming-card--mystery:hover .mystery-placeholder__nebula {
+    animation-duration: 4s;
+}
+
+.upcoming-card--mystery:hover .mystery-placeholder__icon {
+    animation-duration: 1.5s;
+}
+
+.upcoming-card--mystery:hover .mystery-ring--outer {
+    animation-duration: 10s;
+}
+
+.upcoming-card--mystery:hover .mystery-ring--inner {
+    animation-duration: 8s;
+}

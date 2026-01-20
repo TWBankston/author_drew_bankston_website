@@ -333,7 +333,11 @@ class DBC_Square_Payment {
             return;
         }
 
-        $to = 'author@drewbankston.com';
+        // Get notification email from settings
+        $to = DBC_Orders_Settings::get_notification_email();
+        if ( empty( $to ) ) {
+            return; // Notifications disabled
+        }
         $subject = '🎉 New Book Sale! Order #' . $order_id . ' - $' . number_format( $order->total_amount, 2 );
         
         $items = json_decode( $order->order_items, true );
