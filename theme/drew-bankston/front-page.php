@@ -446,12 +446,6 @@ if ( $upcoming_events->have_posts() ) :
         </div>
         <?php elseif ( empty( $all_reviews ) ) : ?>
         <!-- Show awards placeholder only if reviews placeholder wasn't shown -->
-        <?php else : ?>
-        <div class="awards-strip gsap-reveal">
-            <div class="placeholder-notice" style="width: 100%;">
-                <p><strong>[PLACEHOLDER]</strong> Award badges will appear here once added to books.</p>
-            </div>
-        </div>
         <?php endif; ?>
     </div>
 </section>
@@ -461,7 +455,7 @@ if ( $upcoming_events->have_posts() ) :
     <div class="container">
         <div class="section-header gsap-reveal">
             <p class="section-header__eyebrow">Stay Connected</p>
-            <h2 class="section-header__title">Join the Newsletter</h2>
+            <h2 class="section-header__title">Join the Community</h2>
             <p class="section-header__description">Get exclusive updates on new releases, events, and behind-the-scenes content.</p>
         </div>
         

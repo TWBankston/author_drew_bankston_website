@@ -80,10 +80,18 @@ $shipping_address = json_decode( $order->shipping_address, true );
             <h3 style="margin-bottom: var(--space-4);">Items Ordered</h3>
             
             <div style="display: grid; gap: var(--space-4);">
-                <?php foreach ( $order_items as $item ) : ?>
+                <?php foreach ( $order_items as $item ) : 
+                    // Get fresh thumbnail URL for the book (in case the stored URL is outdated/broken)
+                    $fresh_thumbnail = '';
+                    if ( ! empty( $item['book_id'] ) ) {
+                        $fresh_thumbnail = get_the_post_thumbnail_url( $item['book_id'], 'medium' );
+                    }
+                    // Fall back to stored thumbnail if fresh one isn't available
+                    $thumbnail_url = $fresh_thumbnail ? $fresh_thumbnail : ( ! empty( $item['thumbnail'] ) ? $item['thumbnail'] : '' );
+                ?>
                 <div style="display: flex; gap: var(--space-4); padding: var(--space-4); background: rgba(255, 255, 255, 0.03); border-radius: var(--radius-md);">
-                    <?php if ( ! empty( $item['thumbnail'] ) ) : ?>
-                    <img src="<?php echo esc_url( $item['thumbnail'] ); ?>" alt="<?php echo esc_attr( $item['name'] ); ?>" style="width: 60px; height: 90px; object-fit: contain; border-radius: var(--radius-md);">
+                    <?php if ( $thumbnail_url ) : ?>
+                    <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( $item['name'] ); ?>" style="width: 60px; height: 90px; object-fit: contain; border-radius: var(--radius-md);">
                     <?php endif; ?>
                     <div style="flex: 1;">
                         <h4 style="margin-bottom: var(--space-1);"><?php echo esc_html( $item['name'] ); ?></h4>

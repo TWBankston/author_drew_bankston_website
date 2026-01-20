@@ -22,8 +22,7 @@ while ( have_posts() ) : the_post();
     // Purchase options
     $signed_enabled  = get_post_meta( get_the_ID(), '_dbc_book_signed_enabled', true );
     $signed_price    = get_post_meta( get_the_ID(), '_dbc_book_signed_price', true );
-    $digital_enabled = get_post_meta( get_the_ID(), '_dbc_book_digital_enabled', true );
-    $digital_price   = get_post_meta( get_the_ID(), '_dbc_book_digital_price', true );
+    $kindle_url      = get_post_meta( get_the_ID(), '_dbc_book_kindle_url', true );
     
     $series = dbt_get_book_series( get_the_ID() );
     $genre_display = dbt_get_book_genre( get_the_ID() );
@@ -103,17 +102,19 @@ while ( have_posts() ) : the_post();
                         </button>
                         <?php endif; ?>
                         
-                        <?php if ( $digital_enabled && $digital_price ) : ?>
-                        <button type="button" class="purchase-option purchase-option--digital" data-purchase="digital" data-book-id="<?php echo esc_attr( get_the_ID() ); ?>" data-book-title="<?php echo esc_attr( get_the_title() ); ?>" data-price="<?php echo esc_attr( $digital_price ); ?>">
+                        <?php if ( $kindle_url ) : ?>
+                        <a href="<?php echo esc_url( $kindle_url ); ?>" target="_blank" rel="noopener" class="purchase-option purchase-option--digital">
                             <span class="purchase-option__icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                </svg>
                             </span>
                             <span class="purchase-option__text">
-                                <span class="purchase-option__label">Digital Copy</span>
-                                <span class="purchase-option__sublabel">$<?php echo esc_html( number_format( (float) $digital_price, 2 ) ); ?> - Instant Access</span>
+                                <span class="purchase-option__label">Kindle / eBook</span>
+                                <span class="purchase-option__sublabel">Buy on Amazon</span>
                             </span>
                             <span class="purchase-option__arrow">→</span>
-                        </button>
+                        </a>
                         <?php endif; ?>
                     </div>
                     

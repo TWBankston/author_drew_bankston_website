@@ -148,6 +148,7 @@ class DBC_Meta_Boxes {
     
     public static function render_book_retailers( $post ) {
         $amazon      = get_post_meta( $post->ID, '_dbc_book_amazon_url', true );
+        $kindle      = get_post_meta( $post->ID, '_dbc_book_kindle_url', true );
         $barnes      = get_post_meta( $post->ID, '_dbc_book_barnes_url', true );
         $bookshop    = get_post_meta( $post->ID, '_dbc_book_bookshop_url', true );
         $indiebound  = get_post_meta( $post->ID, '_dbc_book_indiebound_url', true );
@@ -157,8 +158,12 @@ class DBC_Meta_Boxes {
         ?>
         <table class="form-table">
             <tr>
-                <th><label for="dbc_book_amazon_url">Amazon</label></th>
-                <td><input type="url" id="dbc_book_amazon_url" name="dbc_book_amazon_url" value="<?php echo esc_url( $amazon ); ?>" class="large-text"></td>
+                <th><label for="dbc_book_amazon_url">Amazon (Paperback)</label></th>
+                <td><input type="url" id="dbc_book_amazon_url" name="dbc_book_amazon_url" value="<?php echo esc_url( $amazon ); ?>" class="large-text" placeholder="Link to paperback listing"></td>
+            </tr>
+            <tr>
+                <th><label for="dbc_book_kindle_url">Amazon Kindle</label></th>
+                <td><input type="url" id="dbc_book_kindle_url" name="dbc_book_kindle_url" value="<?php echo esc_url( $kindle ); ?>" class="large-text" placeholder="Link to Kindle/eBook listing"></td>
             </tr>
             <tr>
                 <th><label for="dbc_book_barnes_url">Barnes & Noble</label></th>
@@ -393,6 +398,7 @@ class DBC_Meta_Boxes {
         // Retailer URLs
         $url_fields = array(
             'dbc_book_amazon_url'    => '_dbc_book_amazon_url',
+            'dbc_book_kindle_url'    => '_dbc_book_kindle_url',
             'dbc_book_barnes_url'    => '_dbc_book_barnes_url',
             'dbc_book_bookshop_url'  => '_dbc_book_bookshop_url',
             'dbc_book_indiebound_url' => '_dbc_book_indiebound_url',

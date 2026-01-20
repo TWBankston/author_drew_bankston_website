@@ -15,7 +15,7 @@
             </div>
             
             <div class="footer-column">
-                <h4>Newsletter</h4>
+                <h4>Community</h4>
                 <form class="footer-newsletter" action="#" method="post">
                     <label class="sr-only" for="footer-email">Email Address</label>
                     <input type="email" id="footer-email" name="email" placeholder="Enter your email" required>
@@ -61,7 +61,7 @@
                 </svg>
             </div>
             <h2 class="modal__title" id="modal-title">Get Your Free Chapter</h2>
-            <p class="modal__subtitle">Sign up for our newsletter and get a free chapter of <strong id="modal-book-title"></strong>!</p>
+            <p class="modal__subtitle">Join the community and get a free chapter of <strong id="modal-book-title"></strong>!</p>
             
             <form class="modal__form" id="free-chapter-form">
                 <input type="hidden" id="modal-book-id" name="book_id" value="">

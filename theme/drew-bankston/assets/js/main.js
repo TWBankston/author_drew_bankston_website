@@ -91,6 +91,18 @@
             closeBtn.addEventListener('click', closeMenu);
         }
 
+        // Mobile submenu toggles
+        const submenuToggles = document.querySelectorAll('.mobile-submenu-toggle');
+        submenuToggles.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const submenu = btn.nextElementSibling;
+                const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+                
+                btn.setAttribute('aria-expanded', !isExpanded);
+                submenu.classList.toggle('active');
+            });
+        });
+
         // Close on link click
         links.forEach(function(link) {
             link.addEventListener('click', closeMenu);

@@ -1,0 +1,8 @@
+Sandbox - 
+
+Application ID: sandbox-sq0idb-aF_D7It7VkqCHd7yDnqifw
+Access token: EAAAlx-2IkBbfC5vlCfeKL4bGaRx-CGSuFQ11Nb5NviFB4oJ7cg2ew22HzzTRtS0
+
+Location - 
+
+Default Test Account Location ID: LTZ598K5Y8CVJ

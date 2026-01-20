@@ -109,7 +109,7 @@ if ( isset( $_POST['dbc_change_password'] ) && wp_verify_nonce( $_POST['dbc_pass
                         </a>
                         <a href="#subscription" class="account-nav__link" data-tab="subscription">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                            Newsletter
+                            Community
                         </a>
                         <a href="#downloads" class="account-nav__link" data-tab="downloads">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -170,7 +170,7 @@ if ( isset( $_POST['dbc_change_password'] ) && wp_verify_nonce( $_POST['dbc_pass
 
                     <!-- Subscription Tab -->
                     <div class="account-panel" id="subscription">
-                        <h2 class="account-panel__title">Newsletter Preferences</h2>
+                        <h2 class="account-panel__title">Community Preferences</h2>
                         <p class="account-panel__description">Manage your email subscription and communication preferences.</p>
                         
                         <form method="post" class="account-form">
@@ -181,7 +181,7 @@ if ( isset( $_POST['dbc_change_password'] ) && wp_verify_nonce( $_POST['dbc_pass
                                     <input type="checkbox" name="newsletter_subscribed" value="1" <?php checked( $newsletter_subscribed, '1' ); ?>>
                                     <span class="account-checkbox__mark"></span>
                                     <span class="account-checkbox__text">
-                                        <strong>Drew Bankston Newsletter</strong>
+                                        <strong>Drew Bankston Community</strong>
                                         <span>Receive updates about new books, events, and exclusive content.</span>
                                     </span>
                                 </label>
@@ -299,10 +299,18 @@ if ( isset( $_POST['dbc_change_password'] ) && wp_verify_nonce( $_POST['dbc_pass
                                 </div>
                                 
                                 <div class="account-order-card__items">
-                                    <?php foreach ( $order_items as $item ) : ?>
+                                    <?php foreach ( $order_items as $item ) : 
+                                        // Get fresh thumbnail URL for the book (in case the stored URL is outdated/broken)
+                                        $fresh_thumbnail = '';
+                                        if ( ! empty( $item['book_id'] ) ) {
+                                            $fresh_thumbnail = get_the_post_thumbnail_url( $item['book_id'], 'medium' );
+                                        }
+                                        // Fall back to stored thumbnail if fresh one isn't available
+                                        $thumbnail_url = $fresh_thumbnail ? $fresh_thumbnail : ( ! empty( $item['thumbnail'] ) ? $item['thumbnail'] : '' );
+                                    ?>
                                     <div class="account-order-item">
-                                        <?php if ( ! empty( $item['thumbnail'] ) ) : ?>
-                                        <img src="<?php echo esc_url( $item['thumbnail'] ); ?>" alt="<?php echo esc_attr( $item['name'] ); ?>" class="account-order-item__thumb">
+                                        <?php if ( $thumbnail_url ) : ?>
+                                        <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( $item['name'] ); ?>" class="account-order-item__thumb">
                                         <?php endif; ?>
                                         <div class="account-order-item__info">
                                             <p class="account-order-item__name"><?php echo esc_html( $item['name'] ); ?></p>
