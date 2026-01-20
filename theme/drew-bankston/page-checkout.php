@@ -415,40 +415,35 @@ foreach ( $cart as $item ) {
                 
                 <!-- Discount Code -->
                 <div class="checkout-discount">
-                    <?php if ( $applied_discount ) : ?>
-                    <div class="checkout-discount__applied">
+                    <div class="checkout-discount__applied" id="discount-applied" style="<?php echo $applied_discount ? '' : 'display: none;'; ?>">
                         <div class="checkout-discount__badge">
-                            <span class="checkout-discount__code"><?php echo esc_html( $applied_discount['code'] ); ?></span>
+                            <span class="checkout-discount__code" id="applied-code-text"><?php echo $applied_discount ? esc_html( $applied_discount['code'] ) : ''; ?></span>
                             <button type="button" class="checkout-discount__remove" id="remove-discount-btn">×</button>
                         </div>
-                        <span class="checkout-discount__savings">-$<?php echo number_format( $discount_amount, 2 ); ?></span>
+                        <span class="checkout-discount__savings" id="applied-savings">-$<?php echo number_format( $discount_amount, 2 ); ?></span>
                     </div>
-                    <?php else : ?>
-                    <div class="checkout-discount__form" id="discount-form">
+                    <div class="checkout-discount__form" id="discount-form" style="<?php echo $applied_discount ? 'display: none;' : ''; ?>">
                         <input type="text" id="discount-code-input" placeholder="Discount code" class="checkout-discount__input">
                         <button type="button" id="apply-discount-btn" class="checkout-discount__btn">Apply</button>
                     </div>
                     <div class="checkout-discount__error" id="discount-error" style="display: none;"></div>
-                    <?php endif; ?>
                 </div>
                 
-                <div class="checkout-summary__totals">
+                <div class="checkout-summary__totals" id="checkout-totals">
                     <div class="checkout-summary__row">
                         <span>Subtotal</span>
-                        <span>$<?php echo esc_html( number_format( $subtotal, 2 ) ); ?></span>
+                        <span id="subtotal-display">$<?php echo esc_html( number_format( $subtotal, 2 ) ); ?></span>
                     </div>
                     
-                    <?php if ( $discount_amount > 0 ) : ?>
-                    <div class="checkout-summary__row checkout-summary__row--discount">
+                    <div class="checkout-summary__row checkout-summary__row--discount" id="discount-row" style="<?php echo $discount_amount > 0 ? '' : 'display: none;'; ?>">
                         <span>Discount</span>
-                        <span class="discount-amount">-$<?php echo esc_html( number_format( $discount_amount, 2 ) ); ?></span>
+                        <span class="discount-amount" id="discount-display">-$<?php echo esc_html( number_format( $discount_amount, 2 ) ); ?></span>
                     </div>
-                    <?php endif; ?>
                     
                     <?php if ( $has_physical ) : ?>
                     <div class="checkout-summary__row">
                         <span>Shipping</span>
-                        <span>$<?php echo esc_html( number_format( $shipping, 2 ) ); ?></span>
+                        <span id="shipping-display">$<?php echo esc_html( number_format( $shipping, 2 ) ); ?></span>
                     </div>
                     <?php endif; ?>
                     
@@ -746,6 +741,19 @@ updateReviewSection();
     const removeBtn = document.getElementById('remove-discount-btn');
     const codeInput = document.getElementById('discount-code-input');
     const errorDiv = document.getElementById('discount-error');
+    const discountForm = document.getElementById('discount-form');
+    const discountApplied = document.getElementById('discount-applied');
+    const appliedCodeText = document.getElementById('applied-code-text');
+    const appliedSavings = document.getElementById('applied-savings');
+    const discountRow = document.getElementById('discount-row');
+    const discountDisplay = document.getElementById('discount-display');
+    const totalAmount = document.getElementById('total-amount');
+    const completeOrderBtn = document.querySelector('.checkout-submit');
+    
+    // Store original values
+    const subtotal = <?php echo $subtotal; ?>;
+    const shipping = <?php echo $shipping; ?>;
+    let currentDiscount = <?php echo $discount_amount; ?>;
     
     if (applyBtn && codeInput) {
         applyBtn.addEventListener('click', function() {
@@ -758,6 +766,7 @@ updateReviewSection();
             
             applyBtn.disabled = true;
             applyBtn.textContent = 'Applying...';
+            hideError();
             
             fetch('<?php echo admin_url( 'admin-ajax.php' ); ?>', {
                 method: 'POST',
@@ -773,15 +782,39 @@ updateReviewSection();
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Reload page to show discount
-                    location.reload();
+                    // Update UI dynamically
+                    currentDiscount = data.data.discount_amount;
+                    const newTotal = data.data.new_total;
+                    
+                    // Show applied discount badge
+                    if (appliedCodeText) appliedCodeText.textContent = data.data.code;
+                    if (appliedSavings) appliedSavings.textContent = data.data.discount_display;
+                    if (discountForm) discountForm.style.display = 'none';
+                    if (discountApplied) discountApplied.style.display = 'flex';
+                    
+                    // Show discount row in totals
+                    if (discountRow) {
+                        discountRow.style.display = 'flex';
+                        if (discountDisplay) discountDisplay.textContent = data.data.discount_display;
+                    }
+                    
+                    // Update total
+                    if (totalAmount) totalAmount.textContent = '$' + newTotal.toFixed(2);
+                    if (completeOrderBtn) completeOrderBtn.textContent = 'Complete Order — $' + newTotal.toFixed(2);
+                    
+                    // Clear input
+                    codeInput.value = '';
+                    
+                    // Show success message briefly
+                    showSuccess(data.data.message);
                 } else {
                     showError(data.data.message || 'Invalid discount code');
-                    applyBtn.disabled = false;
-                    applyBtn.textContent = 'Apply';
                 }
+                applyBtn.disabled = false;
+                applyBtn.textContent = 'Apply';
             })
             .catch(error => {
+                console.error('Discount error:', error);
                 showError('Connection error. Please try again.');
                 applyBtn.disabled = false;
                 applyBtn.textContent = 'Apply';
@@ -811,7 +844,20 @@ updateReviewSection();
             })
             .then(response => response.json())
             .then(data => {
-                location.reload();
+                // Update UI dynamically
+                currentDiscount = 0;
+                const newTotal = subtotal + shipping;
+                
+                // Hide applied discount badge, show form
+                if (discountApplied) discountApplied.style.display = 'none';
+                if (discountForm) discountForm.style.display = 'flex';
+                
+                // Hide discount row in totals
+                if (discountRow) discountRow.style.display = 'none';
+                
+                // Update total
+                if (totalAmount) totalAmount.textContent = '$' + newTotal.toFixed(2);
+                if (completeOrderBtn) completeOrderBtn.textContent = 'Complete Order — $' + newTotal.toFixed(2);
             });
         });
     }
@@ -820,9 +866,27 @@ updateReviewSection();
         if (errorDiv) {
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
+            errorDiv.style.color = '#ef4444';
             setTimeout(() => {
                 errorDiv.style.display = 'none';
             }, 5000);
+        }
+    }
+    
+    function showSuccess(message) {
+        if (errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.style.color = '#22c55e';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+    }
+    
+    function hideError() {
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
         }
     }
 })();
