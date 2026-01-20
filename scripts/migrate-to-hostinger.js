@@ -10,21 +10,15 @@ const SftpClient = require('ssh2-sftp-client');
 const path = require('path');
 const fs = require('fs');
 
-// Hostinger SFTP configuration - password passed via environment variable
+// Hostinger SFTP configuration
 const hostinger = {
     host: '46.202.197.54',
     port: 65002,
     username: 'u666117388',
-    password: process.env.HOSTINGER_PASSWORD
+    password: process.env.HOSTINGER_PASSWORD || 'LiveHonestly25$'
 };
 
-if (!hostinger.password) {
-    console.error('❌ HOSTINGER_PASSWORD environment variable required');
-    console.error('   Run: $env:HOSTINGER_PASSWORD="your-password"; node scripts/migrate-to-hostinger.js');
-    process.exit(1);
-}
-
-const hostingerBasePath = '/home/u666117388/domains/dbankston.wordkeeper.net/public_html';
+const hostingerBasePath = '/home/u666117388/domains/drewbankston.com/public_html';
 const localThemePath = path.join(__dirname, '..', 'theme', 'drew-bankston');
 const localPluginPath = path.join(__dirname, '..', 'plugins', 'drew-bankston-custom');
 const tempUploadsPath = path.join(__dirname, '..', 'temp-uploads');
