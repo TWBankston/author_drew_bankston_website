@@ -212,8 +212,10 @@ $categories = DBC_Taxonomy_Post_Category::get_all_categories( array( 'hide_empty
                 
                 if ( $is_vlog ) {
                     $duration = DBC_CPT_Vlog::get_duration();
+                    $youtube_thumbnail = DBC_CPT_Vlog::get_youtube_thumbnail( get_the_ID(), 'hqdefault' );
                 } else {
                     $reading_time = DBC_CPT_Blog::get_reading_time();
+                    $youtube_thumbnail = false;
                 }
             ?>
             <!-- Card -->
@@ -222,6 +224,16 @@ $categories = DBC_Taxonomy_Post_Category::get_all_categories( array( 'hide_empty
                     <?php if ( has_post_thumbnail() ) : ?>
                         <?php the_post_thumbnail( 'medium_large', array( 'class' => 'absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500' ) ); ?>
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
+                    <?php elseif ( $is_vlog && $youtube_thumbnail ) : ?>
+                        <!-- YouTube Thumbnail -->
+                        <img src="<?php echo esc_url( $youtube_thumbnail ); ?>" alt="<?php the_title_attribute(); ?>" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
+                        <!-- Play Icon Overlay -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
+                                <iconify-icon icon="solar:play-bold" class="text-xl text-white ml-0.5"></iconify-icon>
+                            </div>
+                        </div>
                     <?php else : ?>
                         <!-- Placeholder -->
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-<?php echo $is_vlog ? 'cyan' : 'violet'; ?>-900/20"></div>

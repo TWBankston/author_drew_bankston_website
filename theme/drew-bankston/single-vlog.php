@@ -86,9 +86,9 @@ $related_vlogs = DBC_CPT_Vlog::get_related_vlogs( get_the_ID(), 3 );
                 </div>
                 <?php endif; ?>
                 
-                <!-- Vlog Number Badge -->
+                <!-- Vlog Number Badge - positioned below YouTube's top UI -->
                 <?php if ( $vlog_number ) : ?>
-                <div class="absolute top-6 left-6 px-3 py-1 bg-black/60 backdrop-blur border border-white/10 rounded-md text-xs font-mono text-white z-10">
+                <div class="absolute bottom-6 left-6 px-3 py-1 bg-black/60 backdrop-blur border border-white/10 rounded-md text-xs font-mono text-white z-10">
                     VLOG #<?php echo esc_html( $vlog_number ); ?>
                 </div>
                 <?php endif; ?>
