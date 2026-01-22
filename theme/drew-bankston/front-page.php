@@ -339,6 +339,95 @@ if ( $upcoming_events->have_posts() ) :
 </section>
 <?php endif; ?>
 
+<!-- Latest Transmissions (Blog/Vlog Feed) Section -->
+<?php
+$recent_posts = new WP_Query( array(
+    'post_type'      => array( 'blog', 'vlog' ),
+    'posts_per_page' => 4,
+    'orderby'        => 'date',
+    'order'          => 'DESC',
+) );
+
+if ( $recent_posts->have_posts() ) :
+?>
+<section class="section section--lg" style="background: var(--color-bg-secondary);">
+    <div class="container">
+        <div class="section-header gsap-reveal">
+            <p class="section-header__eyebrow">From the Blog</p>
+            <h2 class="section-header__title">Latest Transmissions</h2>
+            <p class="section-header__description">Updates, insights, and behind-the-scenes from Drew's writing journey.</p>
+        </div>
+        
+        <div class="transmissions-grid gsap-reveal">
+            <?php while ( $recent_posts->have_posts() ) : $recent_posts->the_post(); 
+                $is_vlog = get_post_type() === 'vlog';
+                $category = DBC_Taxonomy_Post_Category::get_post_category();
+                
+                // Get thumbnail or YouTube thumbnail for vlogs
+                $thumbnail_url = '';
+                if ( has_post_thumbnail() ) {
+                    $thumbnail_url = get_the_post_thumbnail_url( get_the_ID(), 'medium_large' );
+                } elseif ( $is_vlog ) {
+                    $thumbnail_url = DBC_CPT_Vlog::get_youtube_thumbnail( get_the_ID(), 'hqdefault' );
+                }
+                
+                // Get reading time for blogs or duration for vlogs
+                if ( $is_vlog ) {
+                    $meta_info = DBC_CPT_Vlog::get_duration();
+                    $meta_info = $meta_info ? $meta_info . ' min' : '';
+                } else {
+                    $meta_info = DBC_CPT_Blog::get_reading_time() . ' min read';
+                }
+            ?>
+            <a href="<?php the_permalink(); ?>" class="transmission-card">
+                <div class="transmission-card__image">
+                    <?php if ( $thumbnail_url ) : ?>
+                        <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy">
+                    <?php else : ?>
+                        <div class="transmission-card__placeholder">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32" opacity="0.3">
+                                <?php if ( $is_vlog ) : ?>
+                                    <path d="M8 5v14l11-7z"/>
+                                <?php else : ?>
+                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                                <?php endif; ?>
+                            </svg>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ( $is_vlog ) : ?>
+                        <div class="transmission-card__play-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    <?php endif; ?>
+                    <span class="transmission-card__type"><?php echo $is_vlog ? 'Vlog' : 'Blog'; ?></span>
+                </div>
+                <div class="transmission-card__content">
+                    <div class="transmission-card__meta">
+                        <?php if ( $category ) : ?>
+                            <span class="transmission-card__category"><?php echo esc_html( $category->name ); ?></span>
+                            <span class="transmission-card__dot">•</span>
+                        <?php endif; ?>
+                        <span class="transmission-card__date"><?php echo get_the_date( 'M j, Y' ); ?></span>
+                    </div>
+                    <h3 class="transmission-card__title"><?php the_title(); ?></h3>
+                    <?php if ( has_excerpt() ) : ?>
+                        <p class="transmission-card__excerpt"><?php echo wp_trim_words( get_the_excerpt(), 12 ); ?></p>
+                    <?php endif; ?>
+                    <?php if ( $meta_info ) : ?>
+                        <span class="transmission-card__time"><?php echo esc_html( $meta_info ); ?></span>
+                    <?php endif; ?>
+                </div>
+            </a>
+            <?php endwhile; wp_reset_postdata(); ?>
+        </div>
+        
+        <div class="series-cta gsap-reveal" style="margin-top: var(--space-10);">
+            <a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>" class="btn btn--outline">View All Transmissions</a>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
 <!-- Reviews & Awards Section -->
 <section class="section section--lg reviews-awards">
     <div class="container">
