@@ -1,0 +1,300 @@
+<html lang="en" class="scroll-smooth"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designing the Tokorel Star System | Drew Bankston</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050810;
+            color: #e2e8f0;
+        }
+
+        h1, h2, h3, h4, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Subtle Card Hover Glow for Related Posts */
+        .blog-card {
+            transition: all 0.3s ease;
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.4) 100%);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 10px 40px -10px rgba(139, 92, 246, 0.15);
+        }
+
+        /* Custom Input Reset */
+        .search-input:focus {
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Content Typography Overrides for specific post content styling */
+        .post-content p {
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col overflow-x-hidden selection:bg-violet-500/30 selection:text-violet-200">
+
+    <!-- Navigation -->
+    <header class="fixed top-0 w-full z-50 border-b border-slate-800/50 bg-[#050810]/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Brand -->
+            <a href="#" class="flex items-center gap-3 group">
+                <iconify-icon icon="solar:quill-path-linear" class="text-violet-400 text-xl transition-transform group-hover:rotate-12"></iconify-icon>
+                <span class="font-serif text-lg tracking-tight text-slate-200">Drew Bankston</span>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Home</a>
+                <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Books</a>
+                <a href="#" class="text-sm text-white font-medium transition-colors">Transmissions</a>
+                <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">About</a>
+                <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
+            </nav>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-6">
+                <button class="text-slate-400 hover:text-white transition-colors flex items-center">
+                    <iconify-icon icon="solar:bag-3-linear" class="text-xl"></iconify-icon>
+                </button>
+                <div class="hidden sm:flex items-center gap-4">
+                    <a href="#" class="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+                        <iconify-icon icon="solar:user-circle-linear" class="text-lg"></iconify-icon>
+                        Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative pt-32 pb-24 lg:pt-40 min-h-screen">
+        
+        <!-- Ambient Background Effects -->
+        <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+            <div class="absolute top-[-10%] left-[50%] -translate-x-1/2 w-[80%] h-[50%] bg-violet-900/10 rounded-full blur-[120px]"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+
+            <!-- Breadcrumb / Back -->
+            <div class="max-w-3xl mx-auto mb-12">
+                <a href="#" class="inline-flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-violet-400 transition-colors uppercase tracking-wider group">
+                    <iconify-icon icon="solar:arrow-left-linear" class="text-base group-hover:-translate-x-1 transition-transform"></iconify-icon>
+                    Back to Transmissions
+                </a>
+            </div>
+
+            <!-- Post Header -->
+            <header class="max-w-4xl mx-auto text-center mb-16 space-y-6">
+                <div class="flex items-center justify-center gap-3">
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-violet-500/10 text-violet-300 border border-violet-500/20">
+                        World Building
+                    </span>
+                    <span class="w-1 h-1 rounded-full bg-slate-700"></span>
+                    <span class="text-xs font-medium text-slate-500 uppercase tracking-widest">Oct 12, 2023</span>
+                </div>
+                
+                <h1 class="font-serif text-4xl md:text-6xl text-white tracking-tight leading-[1.1]">
+                    Designing the Tokorel Star System: A Study in Gravity
+                </h1>
+                
+                <p class="text-lg md:text-xl text-slate-400 font-light max-w-2xl mx-auto leading-relaxed">
+                    Before writing the first chapter of <em>Echoes of the Nebula</em>, I spent three months mapping the orbital mechanics of the twin suns.
+                </p>
+
+                <!-- Author Small -->
+                <div class="flex items-center justify-center gap-3 pt-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400">
+                        <iconify-icon icon="solar:user-circle-linear" class="text-2xl"></iconify-icon>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-sm text-white font-medium">Drew Bankston</div>
+                        <div class="text-xs text-slate-500">Author &amp; Worldsmith</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Featured Image -->
+            <div class="max-w-5xl mx-auto mb-20 rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-2xl shadow-violet-900/10 relative group">
+                <div class="aspect-video relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-violet-900/40 via-slate-900 to-slate-900 z-0"></div>
+                    <!-- Abstract Visualization -->
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] opacity-40" style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 32px 32px;"></div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-violet-500/30 rounded-full animate-[spin_60s_linear_infinite]"></div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-slate-500/20 rounded-full"></div>
+                    
+                    <div class="absolute bottom-6 right-6 flex gap-2">
+                        <button class="bg-black/50 hover:bg-black/70 backdrop-blur text-white p-2 rounded-lg transition-colors border border-white/10">
+                            <iconify-icon icon="solar:maximize-square-minimalistic-linear"></iconify-icon>
+                        </button>
+                    </div>
+                </div>
+                <div class="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-2xl pointer-events-none"></div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
+                
+                <!-- Sidebar Left (Share) -->
+                <div class="hidden lg:block lg:col-span-2">
+                    <div class="sticky top-32 flex flex-col gap-4 items-end">
+                        <span class="text-[10px] uppercase tracking-widest text-slate-600 font-semibold mb-2">Share</span>
+                        <button class="w-10 h-10 rounded-full border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 hover:border-slate-600 flex items-center justify-center transition-all">
+                            <iconify-icon icon="solar:copy-linear" class="text-lg"></iconify-icon>
+                        </button>
+                        <button class="w-10 h-10 rounded-full border border-slate-800 text-slate-400 hover:text-[#1da1f2] hover:bg-slate-800 hover:border-slate-600 flex items-center justify-center transition-all">
+                            <iconify-icon icon="solar:plain-2-linear" class="text-lg"></iconify-icon> <!-- Abstract bird representation -->
+                        </button>
+                        <button class="w-10 h-10 rounded-full border border-slate-800 text-slate-400 hover:text-[#0a66c2] hover:bg-slate-800 hover:border-slate-600 flex items-center justify-center transition-all">
+                            <iconify-icon icon="solar:link-circle-linear" class="text-lg"></iconify-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Text -->
+                <article class="col-span-1 lg:col-span-8 post-content">
+                    <div class="text-slate-300 text-lg leading-8 font-light space-y-8">
+                        <p class="first-letter:text-5xl first-letter:font-serif first-letter:text-white first-letter:float-left first-letter:mr-3 first-letter:mt-[-6px]">
+                            The core concept of the Tokorel system wasn't magic; it was the inescapable tyranny of the Roche limit. When I first sketched the twin suns—Aion and Bael—on a napkin in 2019, I realized that a planet caught in their barycenter wouldn't just have erratic seasons. It would be geographically torn apart every four hundred years.
+                        </p>
+                        <p>
+                            This geological instability became the foundation for the <span class="text-white font-medium">Glass Plains</span>, the region where the protagonists begin their journey.
+                        </p>
+
+                        <h2 class="font-serif text-3xl text-white mt-12 mb-6 tracking-tight">The Binary Problem</h2>
+                        
+                        <p>
+                            Most sci-fi treats binary star systems as a cosmetic choice—two sunsets for the price of one. But the gravitational interactions are violent. I consulted with an astrophysicist friend to calculate the habitable zone (Goldilocks zone) for an S-Type orbit.
+                        </p>
+
+                        <!-- Pull Quote -->
+                        <div class="my-12 pl-6 border-l-2 border-violet-500/50">
+                            <p class="font-serif text-2xl italic text-slate-200 leading-relaxed mb-0">
+                                "Civilization in Tokorel doesn't build to last forever. They build to survive the next Conjunction."
+                            </p>
+                        </div>
+
+                        <p>
+                            This necessitated a nomadic culture. If the ground beneath your feet turns to magma every few centuries due to tidal heating, you don't build stone castles. You build floating cities, or you learn to live in the crust's upper mantle where the temperature is paradoxically more stable.
+                        </p>
+
+                        <h3 class="font-serif text-2xl text-white mt-10 mb-4 tracking-tight">Flora and Fauna Adaptations</h3>
+
+                        <ul class="space-y-4 mb-8 text-slate-300">
+                            <li class="flex gap-3 items-start">
+                                <iconify-icon icon="solar:check-circle-linear" class="text-violet-400 text-xl mt-1 shrink-0"></iconify-icon>
+                                <span><strong class="text-white font-medium">Crystalline Bark:</strong> Trees that reflect excess radiation during the perihelion approach.</span>
+                            </li>
+                            <li class="flex gap-3 items-start">
+                                <iconify-icon icon="solar:check-circle-linear" class="text-violet-400 text-xl mt-1 shrink-0"></iconify-icon>
+                                <span><strong class="text-white font-medium">Subterranean Hibernation:</strong> Most large fauna sleep during the "Bright Years" to avoid thermal exhaustion.</span>
+                            </li>
+                            <li class="flex gap-3 items-start">
+                                <iconify-icon icon="solar:check-circle-linear" class="text-violet-400 text-xl mt-1 shrink-0"></iconify-icon>
+                                <span><strong class="text-white font-medium">Magnetic Sensitivity:</strong> Migration patterns are dictated by the shifting magnetic fields of the dual stars.</span>
+                            </li>
+                        </ul>
+
+                        <p>
+                            The magic system, "Resonance," is essentially a biological manipulation of these magnetic fields. It's not casting spells; it's tuning your body to the frequency of Aion or Bael.
+                        </p>
+                        
+                        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6 my-10 flex gap-4 items-start">
+                            <iconify-icon icon="solar:info-circle-linear" class="text-violet-400 text-2xl shrink-0"></iconify-icon>
+                            <div class="text-sm text-slate-400 leading-relaxed">
+                                <strong class="text-white block mb-1">Author's Note</strong>
+                                For those interested in the actual math used for the orbital period, I utilized a modified version of Kepler's Third Law, accounting for the mass discrepancy between the two stars. The spreadsheet is available for <a href="#" class="text-violet-400 hover:underline">Patreon supporters</a>.
+                            </div>
+                        </div>
+
+                        <p>
+                            In the next transmission, I'll discuss how this environment shaped the architecture of the Void Walkers' citadels. Until then, watch the skies.
+                        </p>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="mt-12 pt-8 border-t border-slate-800/50 flex flex-wrap gap-2">
+                        <a href="#" class="px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-medium transition-colors">#WorldBuilding</a>
+                        <a href="#" class="px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-medium transition-colors">#SciFi</a>
+                        <a href="#" class="px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-medium transition-colors">#BehindTheScenes</a>
+                    </div>
+                </article>
+
+                <!-- Sidebar Right (TOC/Empty for balance) -->
+                <div class="hidden lg:block lg:col-span-2"></div>
+            </div>
+
+            <!-- Subscribe Box -->
+            <div class="max-w-4xl mx-auto mt-24 mb-24">
+                <div class="rounded-2xl bg-gradient-to-r from-violet-900/20 to-slate-900/50 border border-slate-800 p-8 md:p-12 text-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-32 bg-violet-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+                    
+                    <iconify-icon icon="solar:mailbox-linear" class="text-4xl text-violet-300 mb-4"></iconify-icon>
+                    <h3 class="font-serif text-2xl text-white mb-2">Join the Interstellar Log</h3>
+                    <p class="text-slate-400 text-sm mb-6 max-w-md mx-auto">Get notified when new lore drops and book releases are announced. No spam, just signals.</p>
+                    
+                    <form class="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
+                        <input type="email" placeholder="explorer@nebula.com" class="flex-1 bg-slate-950/50 border border-slate-700 text-slate-200 text-sm rounded-lg px-4 py-3 focus:outline-none focus:border-violet-500/50 transition-all">
+                        <button type="button" class="bg-slate-100 hover:bg-white text-slate-900 px-6 py-3 rounded-lg text-sm font-semibold transition-colors">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Related Posts -->
+            <div class="max-w-7xl mx-auto border-t border-slate-800/50 pt-16">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="font-serif text-2xl text-white">Related Transmissions</h3>
+                    <a href="#" class="text-sm text-violet-400 hover:text-violet-300 flex items-center gap-1">View all <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Related Card 1 -->
+                    <a href="#" class="blog-card group rounded-xl p-5 flex flex-col h-full bg-slate-900/20">
+                        <div class="text-xs text-slate-500 mb-3">Sep 15, 2023</div>
+                        <h4 class="font-serif text-lg text-slate-200 group-hover:text-violet-300 transition-colors mb-2">Overcoming Middle-Book Syndrome</h4>
+                        <p class="text-sm text-slate-500 line-clamp-2">Strategies for maintaining tension in the second act of a trilogy.</p>
+                    </a>
+
+                    <!-- Related Card 2 -->
+                    <a href="#" class="blog-card group rounded-xl p-5 flex flex-col h-full bg-slate-900/20">
+                        <div class="text-xs text-slate-500 mb-3">Aug 04, 2023</div>
+                        <h4 class="font-serif text-lg text-slate-200 group-hover:text-violet-300 transition-colors mb-2">The Flora of Sector 7</h4>
+                        <p class="text-sm text-slate-500 line-clamp-2">Why are the plants purple? Photosynthesis on red dwarf planets.</p>
+                    </a>
+
+                    <!-- Related Card 3 -->
+                    <a href="#" class="blog-card group rounded-xl p-5 flex flex-col h-full bg-slate-900/20">
+                        <div class="text-xs text-slate-500 mb-3">Jun 10, 2023</div>
+                        <h4 class="font-serif text-lg text-slate-200 group-hover:text-violet-300 transition-colors mb-2">History of the Void Walkers</h4>
+                        <p class="text-sm text-slate-500 line-clamp-2">A supplemental guide to the ancient faction mentioned in Chapter 4.</p>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Simple -->
+    <footer class="border-t border-slate-800/50 bg-[#050810] py-12">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <span class="font-serif text-slate-500">Drew Bankston © 2024</span>
+            <div class="flex gap-6">
+                <a href="#" class="text-slate-500 hover:text-violet-400 transition-colors"><iconify-icon icon="solar:smart-phone-linear" class="text-xl"></iconify-icon></a>
+                <a href="#" class="text-slate-500 hover:text-violet-400 transition-colors"><iconify-icon icon="solar:letter-linear" class="text-xl"></iconify-icon></a>
+            </div>
+        </div>
+    </footer>
+
+
+</body></html>

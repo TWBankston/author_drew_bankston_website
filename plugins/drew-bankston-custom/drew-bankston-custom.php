@@ -16,8 +16,11 @@ define( 'DBC_URL', plugin_dir_url( __FILE__ ) );
 // Include class files
 require_once DBC_PATH . 'includes/class-cpt-book.php';
 require_once DBC_PATH . 'includes/class-cpt-event.php';
+require_once DBC_PATH . 'includes/class-cpt-blog.php';
+require_once DBC_PATH . 'includes/class-cpt-vlog.php';
 require_once DBC_PATH . 'includes/class-taxonomy-series.php';
 require_once DBC_PATH . 'includes/class-taxonomy-genre.php';
+require_once DBC_PATH . 'includes/class-taxonomy-post-category.php';
 require_once DBC_PATH . 'includes/class-meta-boxes.php';
 require_once DBC_PATH . 'includes/class-schema.php';
 require_once DBC_PATH . 'includes/class-newsletter.php';
@@ -32,8 +35,11 @@ require_once DBC_PATH . 'includes/class-orders-settings.php';
 function dbc_init() {
     DBC_CPT_Book::init();
     DBC_CPT_Event::init();
+    DBC_CPT_Blog::init();
+    DBC_CPT_Vlog::init();
     DBC_Taxonomy_Series::init();
     DBC_Taxonomy_Genre::init();
+    DBC_Taxonomy_Post_Category::init();
     DBC_Meta_Boxes::init();
     DBC_Schema::init();
     DBC_Newsletter::init();
@@ -417,4 +423,103 @@ function dbc_update_kindle_urls() {
     wp_die( $output, 'Update Kindle URLs', array( 'response' => 200 ) );
 }
 add_action( 'init', 'dbc_update_kindle_urls', 99 );
+
+/**
+ * Admin action to create launch blog post
+ * Trigger via: /wp-admin/?dbc_create_launch_post=1
+ */
+function dbc_create_launch_blog_post_action() {
+    if ( ! isset( $_GET['dbc_create_launch_post'] ) || ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+    
+    // Check if post already exists
+    $existing = get_page_by_path( 'welcome-to-the-new-drew-bankston-website', OBJECT, 'blog' );
+    if ( $existing ) {
+        wp_die( 'Launch blog post already exists! <a href="' . get_edit_post_link( $existing->ID ) . '">Edit it here</a>', 'Post Exists' );
+    }
+    
+    // Blog post content
+    $content = '<!-- wp:paragraph {"className":"lead"} -->
+<p class="lead">After months of planning, designing, and building, I\'m thrilled to finally unveil the new drewbankston.com! This has been a labor of love, and I couldn\'t be more excited to share it with you.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>A New Home for Stories</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>When I first started writing, I never imagined I\'d be here—multiple books published, awards won, and most importantly, a community of readers who\'ve joined me on these adventures across galaxies and through magical realms. This new website is my way of giving back to that community.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>What You\'ll Find Here</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>This blog—which I\'m calling "Transmissions from the Void"—will be your direct line to everything happening in my writing world: behind-the-scenes updates, world-building deep dives, writing process insights, and community connection.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Thank You</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>None of this would be possible without you—the readers who\'ve picked up my books, left reviews, sent messages, and shared my stories with friends. Every time I sit down at the keyboard, I think about you.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>To those who\'ve been with me since <em>Khizara</em>, thank you for your patience and loyalty. To those just discovering my work now, welcome aboard!</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>What\'s Next</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The future is bright. More books in the Tokorel series are in development, new standalone adventures across different genres, vlogs documenting my writing journey, and events where we can meet in person.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Until next time, keep looking up at the stars.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><em>With gratitude,</em><br><strong>Drew Bankston</strong></p>
+<!-- /wp:paragraph -->';
+
+    // Create the post
+    $post_id = wp_insert_post( array(
+        'post_title'   => 'Welcome to the New Drew Bankston Website!',
+        'post_name'    => 'welcome-to-the-new-drew-bankston-website',
+        'post_content' => $content,
+        'post_excerpt' => 'After months of planning, designing, and building, I\'m thrilled to finally unveil the new drewbankston.com! This has been a labor of love, and I couldn\'t be more excited to share it with you.',
+        'post_status'  => 'publish',
+        'post_type'    => 'blog',
+        'post_author'  => get_current_user_id(),
+    ) );
+    
+    if ( is_wp_error( $post_id ) ) {
+        wp_die( 'Error creating blog post: ' . $post_id->get_error_message() );
+    }
+    
+    // Set as featured
+    update_post_meta( $post_id, '_dbc_blog_featured', '1' );
+    
+    // Assign to Updates category
+    $updates_term = get_term_by( 'slug', 'updates', 'post_category' );
+    if ( $updates_term ) {
+        wp_set_post_terms( $post_id, array( $updates_term->term_id ), 'post_category' );
+    }
+    
+    $output = '<h1>✅ Launch Blog Post Created!</h1>';
+    $output .= '<p><strong>Title:</strong> Welcome to the New Drew Bankston Website!</p>';
+    $output .= '<p><strong>Status:</strong> Published</p>';
+    $output .= '<p><strong>Featured:</strong> Yes</p>';
+    $output .= '<p><a href="' . get_permalink( $post_id ) . '" class="button button-primary">View Post</a> ';
+    $output .= '<a href="' . get_edit_post_link( $post_id ) . '" class="button">Edit Post</a></p>';
+    
+    wp_die( $output, 'Blog Post Created', array( 'response' => 200 ) );
+}
+add_action( 'init', 'dbc_create_launch_blog_post_action', 99 );
 

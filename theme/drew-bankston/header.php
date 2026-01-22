@@ -30,6 +30,7 @@
                         </ul>
                     </li>
                     <li><a href="<?php echo esc_url( home_url( '/events/' ) ); ?>" <?php echo is_post_type_archive( 'event' ) || is_singular( 'event' ) ? 'aria-current="page"' : ''; ?>>Events</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>" <?php echo is_post_type_archive( 'blog' ) || is_singular( 'blog' ) || is_post_type_archive( 'vlog' ) || is_singular( 'vlog' ) ? 'aria-current="page"' : ''; ?>>Blog</a></li>
                     <li><a href="<?php echo esc_url( home_url( '/about/' ) ); ?>" <?php echo is_page( 'about' ) ? 'aria-current="page"' : ''; ?>>About</a></li>
                     <li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" <?php echo is_page( 'contact' ) ? 'aria-current="page"' : ''; ?>>Contact</a></li>
                 </ul>
@@ -89,6 +90,7 @@
             </ul>
         </li>
         <li><a href="<?php echo esc_url( home_url( '/events/' ) ); ?>">Events</a></li>
+        <li><a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>">Blog</a></li>
         <li><a href="<?php echo esc_url( home_url( '/about/' ) ); ?>">About</a></li>
         <li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Contact</a></li>
         <li><a href="<?php echo esc_url( home_url( '/cart/' ) ); ?>">Cart<?php if ( $cart_count > 0 ) : ?> (<?php echo esc_html( $cart_count ); ?>)<?php endif; ?></a></li>

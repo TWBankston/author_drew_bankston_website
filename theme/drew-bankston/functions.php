@@ -77,6 +77,38 @@ function dbt_add_favicons() {
 add_action( 'wp_head', 'dbt_add_favicons', 1 );
 
 /**
+ * Add Tailwind CSS configuration
+ * Extends default config with site-specific colors and fonts
+ */
+function dbt_tailwind_config() {
+    ?>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    // Site background colors
+                    'site-bg': '#050810',
+                    'site-bg-secondary': '#0d0f12',
+                    'site-bg-tertiary': '#111522',
+                },
+                fontFamily: {
+                    'serif': ['Playfair Display', 'Cormorant Garamond', 'Georgia', 'serif'],
+                    'sans': ['Inter', 'system-ui', 'sans-serif'],
+                },
+            },
+        },
+        // Prevent Tailwind from conflicting with existing styles
+        corePlugins: {
+            preflight: false,
+        },
+    }
+    </script>
+    <?php
+}
+add_action( 'wp_head', 'dbt_tailwind_config', 2 );
+
+/**
  * Custom Login Page Styling
  */
 function dbt_login_styles() {
@@ -855,13 +887,19 @@ add_action( 'register_form', 'dbt_add_redirect_to_registration' );
  * Enqueue scripts and styles
  */
 function dbt_scripts() {
-    // Google Fonts - Cormorant Garamond + Inter
+    // Google Fonts - Cormorant Garamond + Inter + Playfair Display
     wp_enqueue_style(
         'dbt-google-fonts',
-        'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap',
+        'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap',
         array(),
         null
     );
+    
+    // Tailwind CSS via CDN with custom config
+    wp_enqueue_script( 'tailwindcss', 'https://cdn.tailwindcss.com', array(), '3.4.0', false );
+    
+    // Iconify for blog/vlog icons
+    wp_enqueue_script( 'iconify', 'https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js', array(), '1.0.7', true );
     
     // Design tokens
     wp_enqueue_style( 'dbt-tokens', DBT_URL . '/assets/css/tokens.css', array(), DBT_VERSION );

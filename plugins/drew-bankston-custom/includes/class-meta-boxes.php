@@ -11,6 +11,8 @@ class DBC_Meta_Boxes {
         add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
         add_action( 'save_post', array( __CLASS__, 'save_book_meta' ) );
         add_action( 'save_post', array( __CLASS__, 'save_event_meta' ) );
+        add_action( 'save_post', array( __CLASS__, 'save_blog_meta' ) );
+        add_action( 'save_post', array( __CLASS__, 'save_vlog_meta' ) );
     }
     
     public static function add_meta_boxes() {
@@ -57,6 +59,26 @@ class DBC_Meta_Boxes {
             'Event Details',
             array( __CLASS__, 'render_event_details' ),
             'event',
+            'normal',
+            'high'
+        );
+        
+        // Blog meta boxes
+        add_meta_box(
+            'dbc_blog_details',
+            'Blog Post Settings',
+            array( __CLASS__, 'render_blog_details' ),
+            'blog',
+            'side',
+            'default'
+        );
+        
+        // Vlog meta boxes
+        add_meta_box(
+            'dbc_vlog_details',
+            'Vlog Settings',
+            array( __CLASS__, 'render_vlog_details' ),
+            'vlog',
             'normal',
             'high'
         );
@@ -499,6 +521,218 @@ class DBC_Meta_Boxes {
         $is_virtual = isset( $_POST['dbc_event_is_virtual'] ) ? '1' : '';
         update_post_meta( $post_id, '_dbc_event_is_virtual', $is_virtual );
     }
+    
+    /**
+     * Render Blog Details Meta Box
+     */
+    public static function render_blog_details( $post ) {
+        wp_nonce_field( 'dbc_blog_meta', 'dbc_blog_meta_nonce' );
+        
+        $featured     = get_post_meta( $post->ID, '_dbc_blog_featured', true );
+        $reading_time = get_post_meta( $post->ID, '_dbc_blog_reading_time', true );
+        ?>
+        <p>
+            <label for="dbc_blog_featured">
+                <input type="checkbox" id="dbc_blog_featured" name="dbc_blog_featured" value="1" <?php checked( $featured, '1' ); ?>>
+                Featured Post
+            </label>
+            <br><span class="description">Display in featured section on blog page</span>
+        </p>
+        
+        <p>
+            <label for="dbc_blog_reading_time"><strong>Reading Time (minutes)</strong></label><br>
+            <input type="number" id="dbc_blog_reading_time" name="dbc_blog_reading_time" value="<?php echo esc_attr( $reading_time ); ?>" class="small-text" min="1">
+            <br><span class="description">Leave empty to auto-calculate based on word count</span>
+        </p>
+        <?php
+    }
+    
+    /**
+     * Render Vlog Details Meta Box
+     */
+    public static function render_vlog_details( $post ) {
+        wp_nonce_field( 'dbc_vlog_meta', 'dbc_vlog_meta_nonce' );
+        
+        $video_source = get_post_meta( $post->ID, '_dbc_vlog_video_source', true );
+        $youtube_url  = get_post_meta( $post->ID, '_dbc_vlog_youtube_url', true );
+        $local_video  = get_post_meta( $post->ID, '_dbc_vlog_local_video_url', true );
+        $duration     = get_post_meta( $post->ID, '_dbc_vlog_duration', true );
+        $vlog_number  = get_post_meta( $post->ID, '_dbc_vlog_number', true );
+        $chapters     = get_post_meta( $post->ID, '_dbc_vlog_chapters', true );
+        
+        if ( ! is_array( $chapters ) ) $chapters = array();
+        ?>
+        <table class="form-table">
+            <tr>
+                <th><label for="dbc_vlog_number">Vlog Number</label></th>
+                <td>
+                    <input type="text" id="dbc_vlog_number" name="dbc_vlog_number" value="<?php echo esc_attr( $vlog_number ); ?>" class="small-text" placeholder="e.g., 014">
+                    <p class="description">Episode number displayed as badge (e.g., "VLOG #014")</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="dbc_vlog_video_source">Video Source</label></th>
+                <td>
+                    <select id="dbc_vlog_video_source" name="dbc_vlog_video_source">
+                        <option value="youtube" <?php selected( $video_source, 'youtube' ); ?>>YouTube</option>
+                        <option value="local" <?php selected( $video_source, 'local' ); ?>>Local/Self-Hosted</option>
+                    </select>
+                </td>
+            </tr>
+            <tr class="dbc-vlog-youtube-row">
+                <th><label for="dbc_vlog_youtube_url">YouTube URL or ID</label></th>
+                <td>
+                    <input type="text" id="dbc_vlog_youtube_url" name="dbc_vlog_youtube_url" value="<?php echo esc_attr( $youtube_url ); ?>" class="large-text" placeholder="https://www.youtube.com/watch?v=xxxxx or just the video ID">
+                    <p class="description">Paste the full YouTube URL or just the video ID</p>
+                </td>
+            </tr>
+            <tr class="dbc-vlog-local-row">
+                <th><label for="dbc_vlog_local_video_url">Local Video URL</label></th>
+                <td>
+                    <input type="url" id="dbc_vlog_local_video_url" name="dbc_vlog_local_video_url" value="<?php echo esc_url( $local_video ); ?>" class="large-text" placeholder="https://...">
+                    <p class="description">Direct URL to the video file (MP4 recommended)</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="dbc_vlog_duration">Duration</label></th>
+                <td>
+                    <input type="text" id="dbc_vlog_duration" name="dbc_vlog_duration" value="<?php echo esc_attr( $duration ); ?>" class="small-text" placeholder="e.g., 14:32">
+                    <p class="description">Video length in MM:SS or HH:MM:SS format</p>
+                </td>
+            </tr>
+        </table>
+        
+        <h4 style="margin-top: 20px;">Video Chapters</h4>
+        <p class="description">Add timestamps and titles for chapter navigation</p>
+        <div id="dbc-chapters-container">
+            <?php foreach ( $chapters as $i => $chapter ) : ?>
+            <div class="dbc-chapter-row" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
+                <input type="text" name="dbc_vlog_chapters[<?php echo $i; ?>][timestamp]" value="<?php echo esc_attr( $chapter['timestamp'] ?? '' ); ?>" class="small-text" placeholder="00:00" style="width: 70px;">
+                <input type="text" name="dbc_vlog_chapters[<?php echo $i; ?>][title]" value="<?php echo esc_attr( $chapter['title'] ?? '' ); ?>" class="regular-text" placeholder="Chapter title">
+            </div>
+            <?php endforeach; ?>
+            <!-- Add new chapter row -->
+            <?php for ( $i = count( $chapters ); $i < count( $chapters ) + 3; $i++ ) : ?>
+            <div class="dbc-chapter-row" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
+                <input type="text" name="dbc_vlog_chapters[<?php echo $i; ?>][timestamp]" value="" class="small-text" placeholder="00:00" style="width: 70px;">
+                <input type="text" name="dbc_vlog_chapters[<?php echo $i; ?>][title]" value="" class="regular-text" placeholder="Chapter title">
+            </div>
+            <?php endfor; ?>
+        </div>
+        
+        <script>
+        jQuery(document).ready(function($) {
+            function toggleVideoSourceFields() {
+                var source = $('#dbc_vlog_video_source').val();
+                if (source === 'youtube') {
+                    $('.dbc-vlog-youtube-row').show();
+                    $('.dbc-vlog-local-row').hide();
+                } else {
+                    $('.dbc-vlog-youtube-row').hide();
+                    $('.dbc-vlog-local-row').show();
+                }
+            }
+            
+            $('#dbc_vlog_video_source').on('change', toggleVideoSourceFields);
+            toggleVideoSourceFields();
+        });
+        </script>
+        <?php
+    }
+    
+    /**
+     * Save Blog Meta
+     */
+    public static function save_blog_meta( $post_id ) {
+        if ( ! isset( $_POST['dbc_blog_meta_nonce'] ) || ! wp_verify_nonce( $_POST['dbc_blog_meta_nonce'], 'dbc_blog_meta' ) ) {
+            return;
+        }
+        
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+            return;
+        }
+        
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            return;
+        }
+        
+        if ( get_post_type( $post_id ) !== 'blog' ) {
+            return;
+        }
+        
+        // Featured checkbox
+        $featured = isset( $_POST['dbc_blog_featured'] ) ? '1' : '';
+        update_post_meta( $post_id, '_dbc_blog_featured', $featured );
+        
+        // Reading time
+        if ( isset( $_POST['dbc_blog_reading_time'] ) ) {
+            $reading_time = sanitize_text_field( $_POST['dbc_blog_reading_time'] );
+            if ( $reading_time ) {
+                update_post_meta( $post_id, '_dbc_blog_reading_time', $reading_time );
+            } else {
+                delete_post_meta( $post_id, '_dbc_blog_reading_time' );
+            }
+        }
+    }
+    
+    /**
+     * Save Vlog Meta
+     */
+    public static function save_vlog_meta( $post_id ) {
+        if ( ! isset( $_POST['dbc_vlog_meta_nonce'] ) || ! wp_verify_nonce( $_POST['dbc_vlog_meta_nonce'], 'dbc_vlog_meta' ) ) {
+            return;
+        }
+        
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+            return;
+        }
+        
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            return;
+        }
+        
+        if ( get_post_type( $post_id ) !== 'vlog' ) {
+            return;
+        }
+        
+        // Video source
+        if ( isset( $_POST['dbc_vlog_video_source'] ) ) {
+            update_post_meta( $post_id, '_dbc_vlog_video_source', sanitize_text_field( $_POST['dbc_vlog_video_source'] ) );
+        }
+        
+        // YouTube URL
+        if ( isset( $_POST['dbc_vlog_youtube_url'] ) ) {
+            update_post_meta( $post_id, '_dbc_vlog_youtube_url', sanitize_text_field( $_POST['dbc_vlog_youtube_url'] ) );
+        }
+        
+        // Local video URL
+        if ( isset( $_POST['dbc_vlog_local_video_url'] ) ) {
+            update_post_meta( $post_id, '_dbc_vlog_local_video_url', esc_url_raw( $_POST['dbc_vlog_local_video_url'] ) );
+        }
+        
+        // Duration
+        if ( isset( $_POST['dbc_vlog_duration'] ) ) {
+            update_post_meta( $post_id, '_dbc_vlog_duration', sanitize_text_field( $_POST['dbc_vlog_duration'] ) );
+        }
+        
+        // Vlog number
+        if ( isset( $_POST['dbc_vlog_number'] ) ) {
+            update_post_meta( $post_id, '_dbc_vlog_number', sanitize_text_field( $_POST['dbc_vlog_number'] ) );
+        }
+        
+        // Chapters
+        if ( isset( $_POST['dbc_vlog_chapters'] ) ) {
+            $chapters = array();
+            foreach ( $_POST['dbc_vlog_chapters'] as $chapter ) {
+                if ( ! empty( $chapter['timestamp'] ) && ! empty( $chapter['title'] ) ) {
+                    $chapters[] = array(
+                        'timestamp' => sanitize_text_field( $chapter['timestamp'] ),
+                        'title'     => sanitize_text_field( $chapter['title'] ),
+                    );
+                }
+            }
+            update_post_meta( $post_id, '_dbc_vlog_chapters', $chapters );
+        }
+    }
 }
-
 
