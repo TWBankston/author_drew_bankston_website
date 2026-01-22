@@ -5125,10 +5125,17 @@ lottie-player {
    ========================================================================== */
 
 .transmissions-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-6);
-    margin-top: var(--space-10);
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--space-6) !important;
+    margin-top: var(--space-10) !important;
+}
+
+/* Large screens: 4 columns */
+@media (min-width: 1200px) {
+    .transmissions-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
 }
 
 /* Tablet: 2 columns */
