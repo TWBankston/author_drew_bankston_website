@@ -44,9 +44,36 @@ See **SQUARE-PRODUCTION-SETUP.md** for the complete guide.
 
 ---
 
+## ⚠️ Known Issues
+
+### Caching Plugin Interference
+
+The Hostinger server has a caching plugin installed that frequently causes issues with CSS and theme updates not appearing on the live site. This has been a recurring problem during development.
+
+**Symptoms:**
+- CSS changes not applying after deployment
+- New styles showing `display: block` instead of expected values
+- Theme updates appearing cached/stale even with browser cache-busting (`?nocache=X`)
+
+**Workarounds used:**
+1. **Inline styles in templates** - For critical CSS like grids, we've added inline `<style>` blocks directly in PHP templates (e.g., `front-page.php`) to bypass external CSS caching
+2. **Cache-busting query parameters** - Adding `?nocache=X` to URLs for testing (doesn't always work due to server-side caching)
+3. **WordPress Admin cache clear** - Check for cache clearing options in WordPress Admin
+
+**Recommended solutions:**
+- Clear the cache from Hostinger's hPanel after each deployment
+- Consider disabling aggressive caching during active development
+- Contact Hostinger support if caching continues to cause issues
+- Document any cache-related plugins installed and their settings
+
+**Files affected by this workaround:**
+- `theme/drew-bankston/front-page.php` - Contains inline styles for `.transmissions-grid` and `.transmission-card` components
+
+---
+
 ## 📞 Important Links
 
-- **Live Site:** https://honeydew-caribou-244132.hostingersite.com (temporary)
+- **Live Site:** https://drewbankston.com
 - **WordPress Admin:** `/wp-admin/`
 - **Square Settings:** WordPress Admin → Settings → Square Integration
 - **Hostinger Panel:** https://hpanel.hostinger.com/
@@ -63,4 +90,4 @@ Additional planning documents in `Site Plan/`:
 
 ---
 
-**Last Updated:** January 12, 2026
+**Last Updated:** January 22, 2026
