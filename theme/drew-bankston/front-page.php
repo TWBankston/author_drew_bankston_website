@@ -358,6 +358,28 @@ if ( $recent_posts->have_posts() ) :
             <p class="section-header__description">Updates, insights, and behind-the-scenes from Drew's writing journey.</p>
         </div>
         
+        <style>
+            .transmissions-grid { display: grid !important; gap: 1.5rem !important; margin-top: 2.5rem !important; }
+            @media (min-width: 641px) { .transmissions-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+            @media (min-width: 1025px) { .transmissions-grid { grid-template-columns: repeat(4, 1fr) !important; } }
+            .transmission-card { display: flex; flex-direction: column; background: var(--color-bg-tertiary, #1e293b); border: 1px solid rgba(255,255,255,0.05); border-radius: 1rem; overflow: hidden; text-decoration: none; color: inherit; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; }
+            .transmission-card:hover { transform: translateY(-4px); border-color: rgba(167,139,250,0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+            .transmission-card__image { position: relative; aspect-ratio: 16/9; overflow: hidden; background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(15,23,42,0.8)); }
+            .transmission-card__image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+            .transmission-card:hover .transmission-card__image img { transform: scale(1.05); }
+            .transmission-card__placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(15,23,42,0.9)); color: #94a3b8; }
+            .transmission-card__play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 48px; height: 48px; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2); color: #fff; }
+            .transmission-card__type { position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-radius: 0.25rem; color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+            .transmission-card__content { display: flex; flex-direction: column; padding: 1rem; flex: 1; }
+            .transmission-card__meta { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.75rem; color: #94a3b8; }
+            .transmission-card__category { color: #a78bfa; }
+            .transmission-card__dot { opacity: 0.5; }
+            .transmission-card__title { font-family: var(--font-serif, Georgia, serif); font-size: 1.125rem; font-weight: 500; color: #f8fafc; line-height: 1.375; margin-bottom: 0.5rem; transition: color 0.3s; }
+            .transmission-card:hover .transmission-card__title { color: #a78bfa; }
+            .transmission-card__excerpt { font-size: 0.875rem; color: #94a3b8; line-height: 1.6; margin-bottom: 0.75rem; flex: 1; }
+            .transmission-card__time { font-size: 0.75rem; color: #64748b; margin-top: auto; }
+            @media (max-width: 640px) { .transmission-card__excerpt { display: none; } }
+        </style>
         <div class="transmissions-grid gsap-reveal">
             <?php while ( $recent_posts->have_posts() ) : $recent_posts->the_post(); 
                 $is_vlog = get_post_type() === 'vlog';
