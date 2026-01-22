@@ -207,11 +207,26 @@ class DBC_Square_Payment {
                         'last_name'  => sanitize_text_field( $customer_data['last_name'] ),
                     ) );
                     
+                    // Handle newsletter subscription for new account
+                    if ( ! empty( $customer_data['subscribe_newsletter'] ) ) {
+                        update_user_meta( $user_id, 'dbc_newsletter_subscribed', '1' );
+                    }
+                    
                     // Note: We can't log in during AJAX, user will need to log in manually
                 }
             } else {
                 $user_id = 0; // User exists, don't create duplicate
             }
+        }
+        
+        // Subscribe to Mailchimp if user opted in (works for both new accounts and guest checkout)
+        if ( ! empty( $customer_data['subscribe_newsletter'] ) ) {
+            $email = sanitize_email( $customer_data['email'] );
+            $first_name = sanitize_text_field( $customer_data['first_name'] ?? '' );
+            $last_name = sanitize_text_field( $customer_data['last_name'] ?? '' );
+            
+            // Use the newsletter class to subscribe to Mailchimp with purchase tag
+            self::subscribe_to_mailchimp_with_purchase( $email, $first_name, $last_name );
         }
 
         // Insert order
@@ -632,5 +647,57 @@ class DBC_Square_Payment {
 
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         dbDelta( $sql );
+    }
+
+    /**
+     * Subscribe email to Mailchimp with purchase-specific tags
+     */
+    private static function subscribe_to_mailchimp_with_purchase( $email, $first_name = '', $last_name = '' ) {
+        $api_key = get_option( 'dbc_mailchimp_api_key' );
+        $list_id = get_option( 'dbc_mailchimp_list_id' );
+        $server = get_option( 'dbc_mailchimp_server_prefix' );
+        
+        if ( empty( $api_key ) || empty( $list_id ) || empty( $server ) ) {
+            // Mailchimp not configured, skip silently
+            error_log( 'Mailchimp not configured - skipping checkout subscription for: ' . $email );
+            return array( 'status' => 'skipped', 'message' => 'Mailchimp not configured' );
+        }
+        
+        $url = "https://{$server}.api.mailchimp.com/3.0/lists/{$list_id}/members";
+        
+        $data = array(
+            'email_address' => $email,
+            'status'        => 'subscribed',
+            'merge_fields'  => array(
+                'FNAME' => $first_name,
+                'LNAME' => $last_name,
+            ),
+            'tags' => array( 'Website Purchase', 'Checkout Signup' ),
+        );
+        
+        $response = wp_remote_post( $url, array(
+            'headers' => array(
+                'Authorization' => 'Basic ' . base64_encode( 'anystring:' . $api_key ),
+                'Content-Type'  => 'application/json',
+            ),
+            'body'    => json_encode( $data ),
+            'timeout' => 15,
+        ) );
+        
+        if ( is_wp_error( $response ) ) {
+            error_log( 'Mailchimp subscription error for ' . $email . ': ' . $response->get_error_message() );
+            return array( 'status' => 'error', 'message' => $response->get_error_message() );
+        }
+        
+        $body = json_decode( wp_remote_retrieve_body( $response ), true );
+        $code = wp_remote_retrieve_response_code( $response );
+        
+        // 200 = success, 400 with "Member Exists" = already subscribed (OK)
+        if ( $code === 200 || ( $code === 400 && strpos( $body['title'] ?? '', 'Member Exists' ) !== false ) ) {
+            return array( 'status' => 'success' );
+        }
+        
+        error_log( 'Mailchimp subscription failed for ' . $email . ': ' . ( $body['detail'] ?? 'Unknown error' ) );
+        return array( 'status' => 'error', 'message' => $body['detail'] ?? 'Unknown error' );
     }
 }

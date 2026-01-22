@@ -16,6 +16,7 @@
         initHeader();
         initMobileMenu();
         initBookFilters();
+        initFooterNewsletter();
         
         if (!prefersReducedMotion) {
             initGSAPAnimations();
@@ -120,6 +121,72 @@
             if (e.target === nav) {
                 closeMenu();
             }
+        });
+    }
+
+    /**
+     * Footer newsletter form handler
+     */
+    function initFooterNewsletter() {
+        const form = document.querySelector('.footer-newsletter');
+        if (!form) return;
+
+        const emailInput = form.querySelector('input[type="email"]');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            if (!email) {
+                alert('Please enter your email address.');
+                return;
+            }
+
+            // Disable button and show loading
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Subscribing...';
+
+            // Send AJAX request - using simple subscribe endpoint
+            const formData = new FormData();
+            formData.append('action', 'dbc_footer_subscribe');
+            formData.append('nonce', dbtData.newsletterNonce || '');
+            formData.append('email', email);
+
+            fetch(dbtData.ajaxUrl, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    // Show success state
+                    emailInput.value = '';
+                    submitBtn.textContent = 'Subscribed!';
+                    submitBtn.style.background = 'var(--color-success, #22c55e)';
+                    
+                    // Reset after delay
+                    setTimeout(function() {
+                        submitBtn.textContent = originalText;
+                        submitBtn.style.background = '';
+                        submitBtn.disabled = false;
+                    }, 3000);
+                } else {
+                    alert(data.data.message || 'Something went wrong. Please try again.');
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            })
+            .catch(function(error) {
+                console.error('Newsletter error:', error);
+                alert('Connection error. Please check your internet and try again.');
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
         });
     }
 

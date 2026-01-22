@@ -11,6 +11,8 @@ class DBC_Newsletter {
         // AJAX handlers
         add_action( 'wp_ajax_dbc_newsletter_subscribe', array( __CLASS__, 'handle_subscribe' ) );
         add_action( 'wp_ajax_nopriv_dbc_newsletter_subscribe', array( __CLASS__, 'handle_subscribe' ) );
+        add_action( 'wp_ajax_dbc_footer_subscribe', array( __CLASS__, 'handle_footer_subscribe' ) );
+        add_action( 'wp_ajax_nopriv_dbc_footer_subscribe', array( __CLASS__, 'handle_footer_subscribe' ) );
         add_action( 'wp_ajax_dbc_check_download_access', array( __CLASS__, 'check_download_access' ) );
         add_action( 'wp_ajax_nopriv_dbc_check_download_access', array( __CLASS__, 'check_download_access' ) );
         
@@ -270,6 +272,67 @@ class DBC_Newsletter {
     }
     
     /**
+     * Handle simple footer newsletter subscription via AJAX
+     */
+    public static function handle_footer_subscribe() {
+        // Verify nonce
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'dbc_newsletter_nonce' ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed. Please refresh and try again.' ) );
+        }
+        
+        $email = sanitize_email( $_POST['email'] ?? '' );
+        
+        if ( ! is_email( $email ) ) {
+            wp_send_json_error( array( 'message' => 'Please enter a valid email address.' ) );
+        }
+        
+        // Subscribe to Mailchimp with footer-specific tag
+        $api_key = get_option( 'dbc_mailchimp_api_key' );
+        $list_id = get_option( 'dbc_mailchimp_list_id' );
+        $server = get_option( 'dbc_mailchimp_server_prefix' );
+        
+        if ( ! empty( $api_key ) && ! empty( $list_id ) && ! empty( $server ) ) {
+            $url = "https://{$server}.api.mailchimp.com/3.0/lists/{$list_id}/members";
+            
+            $data = array(
+                'email_address' => $email,
+                'status'        => 'subscribed',
+                'tags'          => array( 'Footer Signup', 'Website Signup' ),
+            );
+            
+            $response = wp_remote_post( $url, array(
+                'headers' => array(
+                    'Authorization' => 'Basic ' . base64_encode( 'anystring:' . $api_key ),
+                    'Content-Type'  => 'application/json',
+                ),
+                'body'    => json_encode( $data ),
+                'timeout' => 15,
+            ) );
+            
+            if ( is_wp_error( $response ) ) {
+                error_log( 'Mailchimp footer subscription error: ' . $response->get_error_message() );
+            }
+        }
+        
+        // Store subscriber locally
+        $subscribers = get_option( 'dbc_newsletter_subscribers', array() );
+        $subscribers[] = array(
+            'email'      => $email,
+            'first_name' => '',
+            'last_name'  => '',
+            'book'       => 'Footer Signup',
+            'date'       => current_time( 'mysql' ),
+        );
+        update_option( 'dbc_newsletter_subscribers', $subscribers );
+        
+        // Set cookies
+        setcookie( 'dbc_subscribed', 'yes', time() + ( 30 * DAY_IN_SECONDS ), '/' );
+        setcookie( 'dbc_subscriber_email', $email, time() + ( 30 * DAY_IN_SECONDS ), '/' );
+        
+        wp_send_json_success( array( 'message' => 'Thank you for subscribing!' ) );
+    }
+    
+    /**
      * Subscribe email to Mailchimp
      */
     public static function subscribe_to_mailchimp( $email, $first_name = '', $last_name = '' ) {
@@ -374,5 +437,89 @@ class DBC_Newsletter {
         }
         return false;
     }
+    
+    /**
+     * Sync subscription status with Mailchimp (subscribe or unsubscribe)
+     */
+    public static function sync_mailchimp_subscription( $email, $first_name = '', $last_name = '', $subscribe = true ) {
+        $api_key = get_option( 'dbc_mailchimp_api_key' );
+        $list_id = get_option( 'dbc_mailchimp_list_id' );
+        $server = get_option( 'dbc_mailchimp_server_prefix' );
+        
+        if ( empty( $api_key ) || empty( $list_id ) || empty( $server ) ) {
+            return array( 'status' => 'skipped', 'message' => 'Mailchimp not configured' );
+        }
+        
+        // Use member hash for update/unsubscribe
+        $member_hash = md5( strtolower( $email ) );
+        $url = "https://{$server}.api.mailchimp.com/3.0/lists/{$list_id}/members/{$member_hash}";
+        
+        if ( $subscribe ) {
+            // Subscribe or update existing member
+            $data = array(
+                'email_address' => $email,
+                'status_if_new' => 'subscribed',
+                'status'        => 'subscribed',
+                'merge_fields'  => array(
+                    'FNAME' => $first_name,
+                    'LNAME' => $last_name,
+                ),
+                'tags' => array( 'Account Settings Signup' ),
+            );
+            
+            $response = wp_remote_request( $url, array(
+                'method'  => 'PUT',
+                'headers' => array(
+                    'Authorization' => 'Basic ' . base64_encode( 'anystring:' . $api_key ),
+                    'Content-Type'  => 'application/json',
+                ),
+                'body'    => json_encode( $data ),
+                'timeout' => 15,
+            ) );
+        } else {
+            // Unsubscribe - set status to unsubscribed
+            $data = array(
+                'status' => 'unsubscribed',
+            );
+            
+            $response = wp_remote_request( $url, array(
+                'method'  => 'PATCH',
+                'headers' => array(
+                    'Authorization' => 'Basic ' . base64_encode( 'anystring:' . $api_key ),
+                    'Content-Type'  => 'application/json',
+                ),
+                'body'    => json_encode( $data ),
+                'timeout' => 15,
+            ) );
+        }
+        
+        if ( is_wp_error( $response ) ) {
+            error_log( 'Mailchimp sync error for ' . $email . ': ' . $response->get_error_message() );
+            return array( 'status' => 'error', 'message' => $response->get_error_message() );
+        }
+        
+        $code = wp_remote_retrieve_response_code( $response );
+        $body = json_decode( wp_remote_retrieve_body( $response ), true );
+        
+        if ( $code >= 200 && $code < 300 ) {
+            return array( 'status' => 'success' );
+        }
+        
+        // 404 when unsubscribing means they weren't subscribed anyway - that's fine
+        if ( ! $subscribe && $code === 404 ) {
+            return array( 'status' => 'success', 'message' => 'Not in list' );
+        }
+        
+        error_log( 'Mailchimp sync failed for ' . $email . ': ' . ( $body['detail'] ?? 'Unknown error' ) );
+        return array( 'status' => 'error', 'message' => $body['detail'] ?? 'Unknown error' );
+    }
+}
+
+/**
+ * Global helper function for syncing Mailchimp subscription
+ * Can be called from theme files
+ */
+function dbc_sync_mailchimp_subscription( $email, $first_name = '', $last_name = '', $subscribe = true ) {
+    return DBC_Newsletter::sync_mailchimp_subscription( $email, $first_name, $last_name, $subscribe );
 }
 

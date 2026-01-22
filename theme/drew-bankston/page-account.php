@@ -48,8 +48,19 @@ if ( isset( $_POST['dbc_update_profile'] ) && wp_verify_nonce( $_POST['dbc_profi
 
 if ( isset( $_POST['dbc_update_subscription'] ) && wp_verify_nonce( $_POST['dbc_subscription_nonce'], 'dbc_update_subscription' ) ) {
     $newsletter = isset( $_POST['newsletter_subscribed'] ) ? '1' : '0';
+    $old_newsletter = get_user_meta( $user_id, 'dbc_newsletter_subscribed', true );
     update_user_meta( $user_id, 'dbc_newsletter_subscribed', $newsletter );
     $newsletter_subscribed = $newsletter;
+    
+    // Sync with Mailchimp if preference changed
+    if ( $newsletter !== $old_newsletter ) {
+        dbc_sync_mailchimp_subscription( 
+            $current_user->user_email, 
+            $current_user->first_name, 
+            $current_user->last_name, 
+            $newsletter === '1' 
+        );
+    }
     
     $message = 'Subscription preferences updated!';
     $message_type = 'success';

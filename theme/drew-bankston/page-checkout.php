@@ -665,6 +665,7 @@ updateReviewSection();
                             signature_message: formData.get('signature_message'),
                             create_account: formData.get('create_account'),
                             account_password: formData.get('account_password'),
+                            subscribe_newsletter: formData.get('subscribe_newsletter'),
                         };
                         
                         // Send payment to server
