@@ -74,9 +74,9 @@ class DBC_Orders_Settings {
     public static function maybe_create_default_codes() {
         $codes = get_option( 'dbc_discount_codes', array() );
         
-        // Only create if no codes exist
+        // Create default test code if no codes exist
         if ( empty( $codes ) ) {
-            $default_codes = array(
+            $codes = array(
                 'BANK$TON' => array(
                     'code'        => 'BANK$TON',
                     'type'        => 'fixed_price',
@@ -86,12 +86,29 @@ class DBC_Orders_Settings {
                     'usage_limit' => 0, // 0 = unlimited
                     'usage_count' => 0,
                     'expires'     => '', // Empty = never expires
+                    'per_user'    => false,
                     'created_at'  => current_time( 'mysql' ),
                 ),
             );
-            
-            update_option( 'dbc_discount_codes', $default_codes );
         }
+        
+        // Always ensure NEW10 exists (per-user discount for new members)
+        if ( ! isset( $codes['NEW10'] ) ) {
+            $codes['NEW10'] = array(
+                'code'        => 'NEW10',
+                'type'        => 'percentage',
+                'amount'      => 10,
+                'description' => 'New member discount - 10% off, one-time use per customer, valid 30 days from signup',
+                'active'      => true,
+                'usage_limit' => 0, // Per-user limit is handled separately
+                'usage_count' => 0,
+                'expires'     => '', // Per-user expiration is handled separately (30 days from signup)
+                'per_user'    => true, // Special flag for per-user handling
+                'created_at'  => current_time( 'mysql' ),
+            );
+        }
+        
+        update_option( 'dbc_discount_codes', $codes );
     }
     
     /**
@@ -694,13 +711,33 @@ class DBC_Orders_Settings {
             wp_send_json_error( array( 'message' => 'This discount code is no longer active' ) );
         }
         
-        // Check if expired
+        // Check if expired (global expiration)
         if ( ! empty( $code['expires'] ) && strtotime( $code['expires'] ) < time() ) {
             wp_send_json_error( array( 'message' => 'This discount code has expired' ) );
         }
         
-        // Check usage limit
-        if ( $code['usage_limit'] > 0 && $code['usage_count'] >= $code['usage_limit'] ) {
+        // Special handling for per-user codes (like NEW10)
+        if ( ! empty( $code['per_user'] ) && $code['per_user'] === true ) {
+            if ( ! is_user_logged_in() ) {
+                wp_send_json_error( array( 'message' => 'You must be logged in to use this discount code.' ) );
+            }
+            
+            $user_id = get_current_user_id();
+            $check = DBC_Newsletter::can_use_new10_discount( $user_id );
+            
+            if ( ! $check['can_use'] ) {
+                if ( $check['reason'] === 'already_used' ) {
+                    wp_send_json_error( array( 'message' => 'You have already used this discount code.' ) );
+                } elseif ( $check['reason'] === 'expired' ) {
+                    wp_send_json_error( array( 'message' => 'Your discount code has expired. This code was valid for 30 days after account creation.' ) );
+                } else {
+                    wp_send_json_error( array( 'message' => 'You are not eligible for this discount code.' ) );
+                }
+            }
+        }
+        
+        // Check global usage limit (for non-per-user codes)
+        if ( empty( $code['per_user'] ) && $code['usage_limit'] > 0 && $code['usage_count'] >= $code['usage_limit'] ) {
             wp_send_json_error( array( 'message' => 'This discount code has reached its usage limit' ) );
         }
         
@@ -722,6 +759,28 @@ class DBC_Orders_Settings {
             'discount_display' => '-$' . number_format( $discount_amount, 2 ),
             'new_total'       => $subtotal - $discount_amount + DBC_Cart::get_shipping_cost(),
         ) );
+    }
+    
+    /**
+     * Mark per-user discount as used after successful payment
+     */
+    public static function mark_per_user_discount_used( $code_key, $user_id = null ) {
+        if ( ! $user_id ) {
+            $user_id = get_current_user_id();
+        }
+        
+        if ( ! $user_id ) {
+            return;
+        }
+        
+        $codes = get_option( 'dbc_discount_codes', array() );
+        
+        if ( isset( $codes[ $code_key ] ) && ! empty( $codes[ $code_key ]['per_user'] ) ) {
+            // For NEW10 specifically
+            if ( $code_key === 'NEW10' ) {
+                DBC_Newsletter::mark_new10_used( $user_id );
+            }
+        }
     }
     
     /**

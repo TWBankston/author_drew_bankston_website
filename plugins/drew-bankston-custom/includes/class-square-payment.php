@@ -147,6 +147,19 @@ class DBC_Square_Payment {
                 'idempotency_key' => $idempotency_key,
             ) );
 
+            // Handle discount code usage tracking
+            $applied_discount = DBC_Orders_Settings::get_applied_discount();
+            if ( $applied_discount ) {
+                // Increment global usage count
+                DBC_Orders_Settings::increment_usage( $applied_discount['code'] );
+                
+                // Mark per-user discount as used (for codes like NEW10)
+                DBC_Orders_Settings::mark_per_user_discount_used( $applied_discount['code'] );
+                
+                // Clear discount from session
+                DBC_Orders_Settings::clear_discount();
+            }
+            
             // Clear cart
             DBC_Cart::clear_cart();
 

@@ -1,0 +1,6 @@
+# Deny all direct access to files in this folder
+# Downloads must go through the secure PHP handler with authentication
+<FilesMatch ".*">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

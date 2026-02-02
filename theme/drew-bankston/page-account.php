@@ -124,7 +124,7 @@ if ( isset( $_POST['dbc_change_password'] ) && wp_verify_nonce( $_POST['dbc_pass
                         </a>
                         <a href="#downloads" class="account-nav__link" data-tab="downloads">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            Free Chapters
+                            Free Member Perks
                         </a>
                         <a href="#purchases" class="account-nav__link" data-tab="purchases">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
@@ -207,71 +207,125 @@ if ( isset( $_POST['dbc_change_password'] ) && wp_verify_nonce( $_POST['dbc_pass
                         </form>
                     </div>
 
-                    <!-- Downloads Tab -->
+                    <!-- Downloads Tab (Free Member Perks) -->
                     <div class="account-panel" id="downloads">
-                        <h2 class="account-panel__title">Free Chapters</h2>
-                        <p class="account-panel__description">Download free chapters you've unlocked.</p>
+                        <h2 class="account-panel__title">Free Member Perks</h2>
+                        <p class="account-panel__description">As a member, you have access to exclusive free content. Download your perks below!</p>
                         
-                        <?php
-                        // Get all books with free chapters
-                        $books_with_chapters = get_posts( array(
-                            'post_type' => 'book',
-                            'posts_per_page' => -1,
-                            'meta_query' => array(
-                                array(
-                                    'key' => '_dbc_book_free_chapter',
-                                    'value' => '',
-                                    'compare' => '!='
-                                )
-                            )
-                        ) );
-                        
-                        if ( ! empty( $books_with_chapters ) ) :
-                        ?>
-                        <div class="account-downloads">
-                            <?php foreach ( $books_with_chapters as $book ) : 
-                                $free_chapter = get_post_meta( $book->ID, '_dbc_book_free_chapter', true );
-                                $cover_id = get_post_thumbnail_id( $book->ID );
-                                $cover_url = $cover_id ? wp_get_attachment_image_url( $cover_id, 'medium' ) : '';
-                                
-                                // Generate download token for this user
-                                $token = wp_hash( $current_user->user_email . $book->ID . 'user_download' );
-                                set_transient( 'dbc_download_' . $token, array(
-                                    'email'   => $current_user->user_email,
-                                    'book_id' => $book->ID,
-                                    'file'    => $free_chapter,
-                                ), DAY_IN_SECONDS );
-                                
-                                $download_url = add_query_arg( 'dbc_download', $token, home_url( '/' ) );
-                                
-                                // Track download
-                                if ( ! in_array( $book->ID, $downloaded_chapters ) ) {
-                                    $downloaded_chapters[] = $book->ID;
-                                    update_user_meta( $user_id, 'dbc_downloaded_chapters', $downloaded_chapters );
-                                }
-                            ?>
-                            <div class="account-download-item">
-                                <?php if ( $cover_url ) : ?>
-                                    <img src="<?php echo esc_url( $cover_url ); ?>" alt="<?php echo esc_attr( $book->post_title ); ?>" class="account-download-item__cover">
-                                <?php endif; ?>
-                                <div class="account-download-item__info">
-                                    <h3><?php echo esc_html( $book->post_title ); ?></h3>
-                                    <p>Free Chapter • PDF</p>
+                        <!-- Free Short Stories Section -->
+                        <div class="account-section">
+                            <h3 class="account-section__title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                                Free Short Stories
+                            </h3>
+                            <p class="account-section__description">Exclusive short stories available only to members.</p>
+                            
+                            <div class="account-downloads">
+                                <?php 
+                                // Get member content (short stories)
+                                $member_content = DBC_Newsletter::get_member_content();
+                                foreach ( $member_content as $content_id => $content ) :
+                                    if ( $content['type'] !== 'short_story' ) continue;
+                                    $download_url = DBC_Newsletter::get_member_content_download_url( $content_id );
+                                ?>
+                                <div class="account-download-item account-download-item--featured">
+                                    <div class="account-download-item__badge">
+                                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                        Member Exclusive
+                                    </div>
+                                    <div class="account-download-item__icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="48" height="48">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                            <path d="M8 7h8M8 11h8M8 15h4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="account-download-item__info">
+                                        <h3><?php echo esc_html( $content['title'] ); ?></h3>
+                                        <p><?php echo esc_html( $content['description'] ); ?></p>
+                                        <span class="account-download-item__format">PDF • Short Story</span>
+                                    </div>
+                                    <?php if ( $download_url ) : ?>
+                                    <a href="<?php echo esc_url( $download_url ); ?>" class="btn btn--primary btn--sm" download>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                        Download
+                                    </a>
+                                    <?php endif; ?>
                                 </div>
-                                <a href="<?php echo esc_url( $download_url ); ?>" class="btn btn--secondary btn--sm" download>
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                    Download
-                                </a>
+                                <?php endforeach; ?>
                             </div>
-                            <?php endforeach; ?>
                         </div>
-                        <?php else : ?>
-                        <div class="account-empty">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                            <p>No free chapters available yet.</p>
-                            <a href="<?php echo esc_url( home_url( '/books/' ) ); ?>" class="btn btn--primary">Browse Books</a>
+                        
+                        <hr class="account-divider">
+                        
+                        <!-- Free Chapters Section -->
+                        <div class="account-section">
+                            <h3 class="account-section__title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                Free Chapters
+                            </h3>
+                            <p class="account-section__description">Sample chapters from Drew's books.</p>
+                            
+                            <?php
+                            // Get all books with free chapters
+                            $books_with_chapters = get_posts( array(
+                                'post_type' => 'book',
+                                'posts_per_page' => -1,
+                                'meta_query' => array(
+                                    array(
+                                        'key' => '_dbc_book_free_chapter',
+                                        'value' => '',
+                                        'compare' => '!='
+                                    )
+                                )
+                            ) );
+                            
+                            if ( ! empty( $books_with_chapters ) ) :
+                            ?>
+                            <div class="account-downloads">
+                                <?php foreach ( $books_with_chapters as $book ) : 
+                                    $free_chapter = get_post_meta( $book->ID, '_dbc_book_free_chapter', true );
+                                    $cover_id = get_post_thumbnail_id( $book->ID );
+                                    $cover_url = $cover_id ? wp_get_attachment_image_url( $cover_id, 'medium' ) : '';
+                                    
+                                    // Generate download token for this user
+                                    $token = wp_hash( $current_user->user_email . $book->ID . 'user_download' );
+                                    set_transient( 'dbc_download_' . $token, array(
+                                        'email'   => $current_user->user_email,
+                                        'book_id' => $book->ID,
+                                        'file'    => $free_chapter,
+                                    ), DAY_IN_SECONDS );
+                                    
+                                    $download_url = add_query_arg( 'dbc_download', $token, home_url( '/' ) );
+                                    
+                                    // Track download
+                                    if ( ! in_array( $book->ID, $downloaded_chapters ) ) {
+                                        $downloaded_chapters[] = $book->ID;
+                                        update_user_meta( $user_id, 'dbc_downloaded_chapters', $downloaded_chapters );
+                                    }
+                                ?>
+                                <div class="account-download-item">
+                                    <?php if ( $cover_url ) : ?>
+                                        <img src="<?php echo esc_url( $cover_url ); ?>" alt="<?php echo esc_attr( $book->post_title ); ?>" class="account-download-item__cover">
+                                    <?php endif; ?>
+                                    <div class="account-download-item__info">
+                                        <h3><?php echo esc_html( $book->post_title ); ?></h3>
+                                        <p>Free Chapter • PDF</p>
+                                    </div>
+                                    <a href="<?php echo esc_url( $download_url ); ?>" class="btn btn--secondary btn--sm" download>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                        Download
+                                    </a>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php else : ?>
+                            <div class="account-empty account-empty--small">
+                                <p>No free chapters available yet.</p>
+                                <a href="<?php echo esc_url( home_url( '/books/' ) ); ?>" class="btn btn--secondary btn--sm">Browse Books</a>
+                            </div>
+                            <?php endif; ?>
                         </div>
-                        <?php endif; ?>
                     </div>
 
                     <!-- Purchases Tab -->

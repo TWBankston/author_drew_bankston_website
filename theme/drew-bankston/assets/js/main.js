@@ -169,6 +169,13 @@
                     submitBtn.textContent = 'Subscribed!';
                     submitBtn.style.background = 'var(--color-success, #22c55e)';
                     
+                    // Show welcome modal if this is their first signup
+                    if (data.data.show_welcome && typeof window.showWelcomeModal === 'function') {
+                        setTimeout(function() {
+                            window.showWelcomeModal();
+                        }, 500);
+                    }
+                    
                     // Reset after delay
                     setTimeout(function() {
                         submitBtn.textContent = originalText;
@@ -678,6 +685,14 @@
                     if (data.success) {
                         downloadLink.href = data.data.download_url;
                         showState('success');
+                        
+                        // Show welcome modal after a short delay if this is their first signup
+                        if (data.data.show_welcome && typeof window.showWelcomeModal === 'function') {
+                            setTimeout(function() {
+                                closeModal();
+                                window.showWelcomeModal();
+                            }, 2000); // Show after 2 seconds so they can see the download link first
+                        }
                     } else {
                         showError(data.data.message || 'Something went wrong. Please try again.');
                     }
@@ -1216,6 +1231,56 @@
         if (shippingEl) shippingEl.textContent = '$' + data.shipping.toFixed(2);
         if (totalEl) totalEl.textContent = '$' + data.total.toFixed(2);
     }
+
+    /**
+     * Welcome Member Modal
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        initWelcomeModal();
+    });
+
+    function initWelcomeModal() {
+        const modal = document.getElementById('welcome-member-modal');
+        if (!modal) return;
+
+        // Close modal handlers
+        modal.querySelectorAll('[data-modal-close]').forEach(function(el) {
+            el.addEventListener('click', function() {
+                closeWelcomeModal();
+            });
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
+                closeWelcomeModal();
+            }
+        });
+
+        // If modal should be shown on page load (from PHP), make sure body overflow is set
+        if (modal.getAttribute('aria-hidden') === 'false') {
+            modal.classList.add('is-active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeWelcomeModal() {
+            modal.classList.remove('is-active');
+            modal.setAttribute('aria-hidden', 'true');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+
+    // Global function to show welcome modal (can be called from AJAX handlers)
+    window.showWelcomeModal = function() {
+        const modal = document.getElementById('welcome-member-modal');
+        if (!modal) return;
+
+        modal.style.display = 'flex';
+        modal.classList.add('is-active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    };
 
 })();
 
