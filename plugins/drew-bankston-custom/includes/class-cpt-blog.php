@@ -15,6 +15,39 @@ class DBC_CPT_Blog {
     public static function init() {
         add_action( 'init', array( __CLASS__, 'register_post_type' ) );
         add_filter( 'post_updated_messages', array( __CLASS__, 'updated_messages' ) );
+        
+        // Add featured column to admin list
+        add_filter( 'manage_blog_posts_columns', array( __CLASS__, 'add_featured_column' ) );
+        add_action( 'manage_blog_posts_custom_column', array( __CLASS__, 'render_featured_column' ), 10, 2 );
+    }
+    
+    /**
+     * Add Featured column to blog posts admin list
+     */
+    public static function add_featured_column( $columns ) {
+        $new_columns = array();
+        foreach ( $columns as $key => $value ) {
+            $new_columns[ $key ] = $value;
+            // Add featured column after title
+            if ( $key === 'title' ) {
+                $new_columns['featured'] = 'Featured';
+            }
+        }
+        return $new_columns;
+    }
+    
+    /**
+     * Render Featured column content
+     */
+    public static function render_featured_column( $column, $post_id ) {
+        if ( $column === 'featured' ) {
+            $featured = get_post_meta( $post_id, '_dbc_blog_featured', true );
+            if ( $featured === '1' ) {
+                echo '<span style="color: #22c55e; font-weight: bold;">★ Featured</span>';
+            } else {
+                echo '<span style="color: #94a3b8;">—</span>';
+            }
+        }
     }
     
     /**

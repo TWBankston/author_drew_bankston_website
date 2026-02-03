@@ -530,13 +530,24 @@ class DBC_Meta_Boxes {
         
         $featured     = get_post_meta( $post->ID, '_dbc_blog_featured', true );
         $reading_time = get_post_meta( $post->ID, '_dbc_blog_reading_time', true );
+        
+        // Get currently featured post (if any)
+        $current_featured = self::get_current_featured_blog();
+        $is_currently_featured = ( $current_featured && $current_featured->ID == $post->ID );
+        $has_other_featured = ( $current_featured && $current_featured->ID != $post->ID );
         ?>
         <p>
             <label for="dbc_blog_featured">
                 <input type="checkbox" id="dbc_blog_featured" name="dbc_blog_featured" value="1" <?php checked( $featured, '1' ); ?>>
-                Featured Post
+                <strong>Featured Post</strong>
             </label>
-            <br><span class="description">Display in featured section on blog page</span>
+            <?php if ( $is_currently_featured ) : ?>
+                <br><span class="description" style="color: #22c55e;">✓ This post is currently featured on the blog page</span>
+            <?php elseif ( $has_other_featured ) : ?>
+                <br><span class="description" style="color: #f59e0b;">Note: "<?php echo esc_html( $current_featured->post_title ); ?>" is currently featured. Checking this will replace it.</span>
+            <?php else : ?>
+                <br><span class="description">Display as the featured post on the blog page</span>
+            <?php endif; ?>
         </p>
         
         <p>
@@ -545,6 +556,29 @@ class DBC_Meta_Boxes {
             <br><span class="description">Leave empty to auto-calculate based on word count</span>
         </p>
         <?php
+    }
+    
+    /**
+     * Get the currently featured blog post
+     * 
+     * @return WP_Post|null The featured post or null if none
+     */
+    private static function get_current_featured_blog() {
+        $featured = get_posts( array(
+            'post_type'      => 'blog',
+            'posts_per_page' => 1,
+            'meta_query'     => array(
+                array(
+                    'key'     => '_dbc_blog_featured',
+                    'value'   => '1',
+                    'compare' => '=',
+                ),
+            ),
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+        ) );
+        
+        return ! empty( $featured ) ? $featured[0] : null;
     }
     
     /**
@@ -660,8 +694,14 @@ class DBC_Meta_Boxes {
             return;
         }
         
-        // Featured checkbox
+        // Featured checkbox - only ONE post can be featured at a time
         $featured = isset( $_POST['dbc_blog_featured'] ) ? '1' : '';
+        
+        if ( $featured === '1' ) {
+            // Remove featured flag from ALL other blog posts first
+            self::clear_all_featured_blogs( $post_id );
+        }
+        
         update_post_meta( $post_id, '_dbc_blog_featured', $featured );
         
         // Reading time
@@ -672,6 +712,29 @@ class DBC_Meta_Boxes {
             } else {
                 delete_post_meta( $post_id, '_dbc_blog_reading_time' );
             }
+        }
+    }
+    
+    /**
+     * Remove featured flag from all blog posts except the specified one
+     * 
+     * @param int $except_post_id Post ID to exclude from clearing
+     */
+    private static function clear_all_featured_blogs( $except_post_id = 0 ) {
+        global $wpdb;
+        
+        // Get all blog posts that are currently marked as featured (except the one we're setting)
+        $featured_posts = $wpdb->get_col( $wpdb->prepare(
+            "SELECT post_id FROM {$wpdb->postmeta} 
+             WHERE meta_key = '_dbc_blog_featured' 
+             AND meta_value = '1' 
+             AND post_id != %d",
+            $except_post_id
+        ) );
+        
+        // Remove featured flag from each
+        foreach ( $featured_posts as $pid ) {
+            update_post_meta( $pid, '_dbc_blog_featured', '' );
         }
     }
     
