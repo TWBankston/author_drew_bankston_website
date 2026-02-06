@@ -108,6 +108,24 @@ class DBC_Orders_Settings {
             );
         }
         
+        // GAME20 - Super Bowl special (Feb 8, 2026 only, Khizara book only)
+        if ( ! isset( $codes['GAME20'] ) ) {
+            $codes['GAME20'] = array(
+                'code'          => 'GAME20',
+                'type'          => 'percentage',
+                'amount'        => 20,
+                'description'   => 'Super Bowl 2026 special - 20% off Khizara only, Feb 8th only',
+                'active'        => true,
+                'usage_limit'   => 0, // Unlimited uses
+                'usage_count'   => 0,
+                'starts'        => '2026-02-08', // Activates Feb 8, 2026
+                'expires'       => '2026-02-09', // Expires Feb 9, 2026 (end of day Feb 8)
+                'product_slugs' => array( 'khizara' ), // Only applies to Khizara book
+                'product_only'  => true, // Only discount the specific product, not whole order
+                'created_at'    => current_time( 'mysql' ),
+            );
+        }
+        
         update_option( 'dbc_discount_codes', $codes );
     }
     
@@ -124,15 +142,21 @@ class DBC_Orders_Settings {
         foreach ( $codes as $key => $code ) {
             $sanitized_key = strtoupper( sanitize_text_field( $key ) );
             $sanitized[ $sanitized_key ] = array(
-                'code'        => strtoupper( sanitize_text_field( $code['code'] ?? '' ) ),
-                'type'        => sanitize_text_field( $code['type'] ?? 'percentage' ),
-                'amount'      => floatval( $code['amount'] ?? 0 ),
-                'description' => sanitize_text_field( $code['description'] ?? '' ),
-                'active'      => (bool) ( $code['active'] ?? true ),
-                'usage_limit' => intval( $code['usage_limit'] ?? 0 ),
-                'usage_count' => intval( $code['usage_count'] ?? 0 ),
-                'expires'     => sanitize_text_field( $code['expires'] ?? '' ),
-                'created_at'  => sanitize_text_field( $code['created_at'] ?? current_time( 'mysql' ) ),
+                'code'          => strtoupper( sanitize_text_field( $code['code'] ?? '' ) ),
+                'type'          => sanitize_text_field( $code['type'] ?? 'percentage' ),
+                'amount'        => floatval( $code['amount'] ?? 0 ),
+                'description'   => sanitize_text_field( $code['description'] ?? '' ),
+                'active'        => (bool) ( $code['active'] ?? true ),
+                'usage_limit'   => intval( $code['usage_limit'] ?? 0 ),
+                'usage_count'   => intval( $code['usage_count'] ?? 0 ),
+                'starts'        => sanitize_text_field( $code['starts'] ?? '' ),
+                'expires'       => sanitize_text_field( $code['expires'] ?? '' ),
+                'product_slugs' => isset( $code['product_slugs'] ) && is_array( $code['product_slugs'] ) 
+                                   ? array_map( 'sanitize_text_field', $code['product_slugs'] ) 
+                                   : array(),
+                'product_only'  => (bool) ( $code['product_only'] ?? false ),
+                'per_user'      => (bool) ( $code['per_user'] ?? false ),
+                'created_at'    => sanitize_text_field( $code['created_at'] ?? current_time( 'mysql' ) ),
             );
         }
         
@@ -711,9 +735,29 @@ class DBC_Orders_Settings {
             wp_send_json_error( array( 'message' => 'This discount code is no longer active' ) );
         }
         
+        // Check if discount has started yet
+        if ( ! empty( $code['starts'] ) && strtotime( $code['starts'] ) > time() ) {
+            $start_date = date( 'F j, Y', strtotime( $code['starts'] ) );
+            wp_send_json_error( array( 'message' => 'This discount code is not active yet. It will be available on ' . $start_date . '.' ) );
+        }
+        
         // Check if expired (global expiration)
         if ( ! empty( $code['expires'] ) && strtotime( $code['expires'] ) < time() ) {
             wp_send_json_error( array( 'message' => 'This discount code has expired' ) );
+        }
+        
+        // Check if discount is product-specific
+        if ( ! empty( $code['product_slugs'] ) ) {
+            $cart = DBC_Cart::get_cart();
+            $eligible_items = self::get_eligible_cart_items( $code, $cart );
+            
+            if ( empty( $eligible_items ) ) {
+                // Get product names for the error message
+                $product_names = self::get_product_names_from_slugs( $code['product_slugs'] );
+                wp_send_json_error( array( 
+                    'message' => 'This discount code only applies to: ' . implode( ', ', $product_names ) . '. Please add the eligible item to your cart.'
+                ) );
+            }
         }
         
         // Special handling for per-user codes (like NEW10)
@@ -752,8 +796,15 @@ class DBC_Orders_Settings {
         
         $_SESSION['dbc_discount_amount'] = $discount_amount;
         
+        // Build success message
+        $success_message = 'Discount applied!';
+        if ( ! empty( $code['product_only'] ) && ! empty( $code['product_slugs'] ) ) {
+            $product_names = self::get_product_names_from_slugs( $code['product_slugs'] );
+            $success_message = 'Discount applied to ' . implode( ', ', $product_names ) . '!';
+        }
+        
         wp_send_json_success( array(
-            'message'         => 'Discount applied!',
+            'message'         => $success_message,
             'code'            => $code_input,
             'discount_amount' => $discount_amount,
             'discount_display' => '-$' . number_format( $discount_amount, 2 ),
@@ -802,25 +853,115 @@ class DBC_Orders_Settings {
      * Calculate discount amount
      */
     public static function calculate_discount( $code, $cart, $subtotal ) {
+        // Check if discount is product-specific
+        $eligible_subtotal = $subtotal;
+        
+        if ( ! empty( $code['product_only'] ) && ! empty( $code['product_slugs'] ) ) {
+            // Only calculate discount on eligible products
+            $eligible_items = self::get_eligible_cart_items( $code, $cart );
+            $eligible_subtotal = 0;
+            
+            foreach ( $eligible_items as $item ) {
+                $eligible_subtotal += $item['price'] * $item['quantity'];
+            }
+            
+            // If no eligible items, no discount
+            if ( $eligible_subtotal <= 0 ) {
+                return 0;
+            }
+        }
+        
         switch ( $code['type'] ) {
             case 'percentage':
-                return $subtotal * ( $code['amount'] / 100 );
+                return $eligible_subtotal * ( $code['amount'] / 100 );
                 
             case 'fixed_amount':
-                return min( $code['amount'], $subtotal ); // Don't go negative
+                return min( $code['amount'], $eligible_subtotal ); // Don't go negative
                 
             case 'fixed_price':
                 // Set each item to fixed price
-                $item_count = 0;
-                foreach ( $cart as $item ) {
-                    $item_count += $item['quantity'];
+                if ( ! empty( $code['product_only'] ) && ! empty( $code['product_slugs'] ) ) {
+                    $eligible_items = self::get_eligible_cart_items( $code, $cart );
+                    $item_count = 0;
+                    foreach ( $eligible_items as $item ) {
+                        $item_count += $item['quantity'];
+                    }
+                } else {
+                    $item_count = 0;
+                    foreach ( $cart as $item ) {
+                        $item_count += $item['quantity'];
+                    }
                 }
                 $fixed_total = $code['amount'] * $item_count;
-                return max( 0, $subtotal - $fixed_total );
+                return max( 0, $eligible_subtotal - $fixed_total );
                 
             default:
                 return 0;
         }
+    }
+    
+    /**
+     * Get cart items that are eligible for a product-specific discount
+     * 
+     * @param array $code The discount code configuration
+     * @param array $cart The cart items
+     * @return array Eligible cart items
+     */
+    public static function get_eligible_cart_items( $code, $cart ) {
+        if ( empty( $code['product_slugs'] ) ) {
+            return $cart; // All items eligible if no product restriction
+        }
+        
+        $eligible = array();
+        $eligible_book_ids = self::get_book_ids_from_slugs( $code['product_slugs'] );
+        
+        foreach ( $cart as $key => $item ) {
+            if ( isset( $item['book_id'] ) && in_array( $item['book_id'], $eligible_book_ids ) ) {
+                $eligible[ $key ] = $item;
+            }
+        }
+        
+        return $eligible;
+    }
+    
+    /**
+     * Get book IDs from slugs
+     * 
+     * @param array $slugs Array of book slugs
+     * @return array Array of book IDs
+     */
+    public static function get_book_ids_from_slugs( $slugs ) {
+        $book_ids = array();
+        
+        foreach ( $slugs as $slug ) {
+            $book = get_page_by_path( $slug, OBJECT, 'book' );
+            if ( $book ) {
+                $book_ids[] = $book->ID;
+            }
+        }
+        
+        return $book_ids;
+    }
+    
+    /**
+     * Get product names from slugs (for error messages)
+     * 
+     * @param array $slugs Array of book slugs
+     * @return array Array of book titles
+     */
+    public static function get_product_names_from_slugs( $slugs ) {
+        $names = array();
+        
+        foreach ( $slugs as $slug ) {
+            $book = get_page_by_path( $slug, OBJECT, 'book' );
+            if ( $book ) {
+                $names[] = $book->post_title;
+            } else {
+                $names[] = ucfirst( $slug ); // Fallback to slug
+            }
+        }
+        
+        return $names;
     }
     
     /**
