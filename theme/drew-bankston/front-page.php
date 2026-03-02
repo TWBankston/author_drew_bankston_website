@@ -566,8 +566,8 @@ if ( $recent_posts->have_posts() ) :
     <div class="container">
         <div class="section-header gsap-reveal">
             <p class="section-header__eyebrow">Stay Connected</p>
-            <h2 class="section-header__title">Join the Community</h2>
-            <p class="section-header__description">Get exclusive updates on new releases, events, and behind-the-scenes content.</p>
+            <h2 class="section-header__title">Join the Tokorel Family</h2>
+            <p class="section-header__description">Get updates on new releases, events, and exclusive content. No spam, ever. Unsubscribe anytime.</p>
         </div>
         
         <form class="newsletter-form gsap-reveal" action="#" method="post">

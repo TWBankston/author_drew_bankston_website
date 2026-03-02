@@ -2,7 +2,7 @@
 /**
  * Template Part: Subscribe Box
  * 
- * "Join the Interstellar Log" newsletter subscription component
+ * "Join the Tokorel Family" newsletter subscription component
  * 
  * Usage:
  * get_template_part( 'template-parts/subscribe-box' );
@@ -19,8 +19,8 @@ $is_minimal = $style === 'minimal';
 <!-- Minimal Style Subscribe Box -->
 <div class="text-center">
     <iconify-icon icon="solar:bell-bing-linear" class="text-3xl text-violet-400 mb-4"></iconify-icon>
-    <h3 class="font-serif text-2xl text-white mb-2">Never Miss a Transmission</h3>
-    <p class="text-slate-500 text-sm mb-6">Get notified when new posts drop.</p>
+    <h3 class="font-serif text-2xl text-white mb-2">Join the Tokorel Family</h3>
+    <p class="text-slate-500 text-sm mb-6">Get updates on new posts, releases, and exclusive content. No spam, unsubscribe anytime.</p>
     <form class="subscribe-form flex justify-center gap-2 max-w-sm mx-auto" data-action="footer">
         <input type="email" name="email" placeholder="Email address" required class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg px-4 py-2 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30 transition-all">
         <button type="submit" class="bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
@@ -40,8 +40,8 @@ $is_minimal = $style === 'minimal';
     <div class="absolute top-0 right-0 p-32 bg-violet-500/10 blur-[80px] rounded-full pointer-events-none"></div>
     
     <iconify-icon icon="solar:mailbox-linear" class="text-4xl text-violet-300 mb-4 relative z-10"></iconify-icon>
-    <h3 class="font-serif text-2xl text-white mb-2 relative z-10">Join the Interstellar Log</h3>
-    <p class="text-slate-400 text-sm mb-6 max-w-md mx-auto relative z-10">Get notified when new lore drops and book releases are announced. No spam, just signals.</p>
+    <h3 class="font-serif text-2xl text-white mb-2 relative z-10">Join the Tokorel Family</h3>
+    <p class="text-slate-400 text-sm mb-6 max-w-md mx-auto relative z-10">Get updates on new releases, lore, and exclusive content. No spam, unsubscribe anytime.</p>
     
     <form class="subscribe-form flex flex-col sm:flex-row gap-3 max-w-sm mx-auto relative z-10" data-action="footer">
         <input type="email" name="email" placeholder="explorer@nebula.com" required class="flex-1 bg-slate-950/50 border border-slate-700 text-slate-200 text-sm rounded-lg px-4 py-3 focus:outline-none focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/30 transition-all placeholder:text-slate-600">

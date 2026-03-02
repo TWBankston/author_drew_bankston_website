@@ -192,7 +192,7 @@ if ( isset( $_POST['dbc_change_password'] ) && wp_verify_nonce( $_POST['dbc_pass
                                     <input type="checkbox" name="newsletter_subscribed" value="1" <?php checked( $newsletter_subscribed, '1' ); ?>>
                                     <span class="account-checkbox__mark"></span>
                                     <span class="account-checkbox__text">
-                                        <strong>Drew Bankston Community</strong>
+                                        <strong>Tokorel Family</strong>
                                         <span>Receive updates about new books, events, and exclusive content.</span>
                                     </span>
                                 </label>

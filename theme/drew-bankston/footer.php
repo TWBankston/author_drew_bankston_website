@@ -15,7 +15,8 @@
             </div>
             
             <div class="footer-column">
-                <h4>Community</h4>
+                <h4>Join the Tokorel Family</h4>
+                <p class="text-muted" style="font-size: var(--text-sm); margin-bottom: var(--space-2);">Get updates on new releases and exclusive content.</p>
                 <form class="footer-newsletter" action="#" method="post">
                     <label class="sr-only" for="footer-email">Email Address</label>
                     <input type="email" id="footer-email" name="email" placeholder="Enter your email" required>
@@ -61,7 +62,7 @@
                 </svg>
             </div>
             <h2 class="modal__title" id="modal-title">Get Your Free Chapter</h2>
-            <p class="modal__subtitle">Join the community and get a free chapter of <strong id="modal-book-title"></strong>!</p>
+            <p class="modal__subtitle">Join the Tokorel Family and get a free chapter of <strong id="modal-book-title"></strong>!</p>
             
             <form class="modal__form" id="free-chapter-form">
                 <input type="hidden" id="modal-book-id" name="book_id" value="">
@@ -163,7 +164,7 @@ if ( isset( $_COOKIE['dbc_show_newsletter_welcome'] ) && $_COOKIE['dbc_show_news
                 </svg>
             </div>
             
-            <h2 class="modal__title welcome-modal__title" id="welcome-modal-title">Welcome to the Community!</h2>
+            <h2 class="modal__title welcome-modal__title" id="welcome-modal-title">Welcome to the Tokorel Family!</h2>
             <p class="modal__subtitle welcome-modal__subtitle">Thank you for joining! As a member, you've unlocked some exclusive perks.</p>
             
             <!-- Free Short Story Section -->

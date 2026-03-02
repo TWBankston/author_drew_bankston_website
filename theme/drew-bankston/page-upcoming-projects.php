@@ -37,7 +37,7 @@ get_header();
         <div class="upcoming-intro">
             <p class="upcoming-intro__text">
                 Drew is always working on new stories to share with readers. Below you'll find projects currently in development. 
-                Sign up for the community newsletter to be the first to know when these books become available.
+                Join the Tokorel Family to be the first to know when these books become available.
             </p>
         </div>
     </div>
@@ -150,8 +150,8 @@ get_header();
     <div class="container">
         <div class="section-header">
             <p class="section-header__eyebrow">Stay Updated</p>
-            <h2 class="section-header__title">Join the Community</h2>
-            <p class="section-header__description">Be the first to know when new books are released. Get exclusive updates, behind-the-scenes content, and special offers.</p>
+            <h2 class="section-header__title">Join the Tokorel Family</h2>
+            <p class="section-header__description">Be the first to know when new books are released. Get exclusive updates, behind-the-scenes content, and special offers. No spam, unsubscribe anytime.</p>
         </div>
         <div class="series-cta">
             <a href="#" class="btn btn--primary btn--lg" data-modal="newsletter">Sign Up for Updates</a>
